@@ -15,24 +15,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\glad.c">
+    <ClCompile Include="src\cpp\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\modelData.cpp">
+    <ClCompile Include="src\cpp\GLRenderCore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\GLRenderCore.cpp">
+    <ClCompile Include="src\cpp\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\test.cpp">
+    <ClCompile Include="src\cpp\modelData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\cpp\Shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GLRenderCore.h">
+    <ClInclude Include="src\header\GLRenderCore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

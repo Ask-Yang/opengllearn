@@ -19,14 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GLRenderCore.cpp" />
-    <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\modelData.cpp" />
-    <ClCompile Include="src\test.cpp" />
+    <ClCompile Include="src\cpp\glad.c" />
+    <ClCompile Include="src\cpp\GLRenderCore.cpp" />
+    <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\modelData.cpp" />
+    <ClCompile Include="src\cpp\Shader.cpp" />
+    <ClCompile Include="src\cpp\test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GLRenderCore.h" />
+    <ClInclude Include="src\header\GLRenderCore.h" />
+    <ClInclude Include="src\header\Shader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -90,7 +92,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\includes;$(IncludePath)</IncludePath>
+    <IncludePath>.\includes;.\src\header;$(IncludePath)</IncludePath>
     <LibraryPath>.\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
