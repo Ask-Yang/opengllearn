@@ -27,12 +27,12 @@ void Texture2D::use(int GL_TEXTURE_MACRO)
 void Texture2D::setTextureWrapMode(WrapMode wm)
 {
 	textureWrapMode = wm;
-	if (textureWrapMode == WrapMode::Repeat || textureWrapMode == WrapMode::Default)
+	if (textureWrapMode == WrapMode::Repeat)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
-	else if (textureWrapMode == WrapMode::Clamp)
+	else if (textureWrapMode == WrapMode::Clamp || textureWrapMode == WrapMode::Default)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

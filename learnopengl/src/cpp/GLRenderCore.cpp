@@ -62,12 +62,15 @@ void GLRenderCore::Run()
 void GLRenderCore::SetShader(std::string vertexShaderPath, std::string fragmentShaderPath)
 {
 	coreShader = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
-	coreShader->setTexture("texture1", 3);
+	coreShader->use();
+	coreShader->setTexture("texture1", 0);
+	coreShader->setTexture("texture2", 1);
 }
 
-void GLRenderCore::AddTexture(std::string texturePath)
+shared_ptr<Texture2D> GLRenderCore::AddTexture(std::string texturePath)
 {
 	coreTexture2dArr.push_back(make_shared<Texture2D>(texturePath));
+	return coreTexture2dArr.back();
 }
 
 void GLRenderCore::processInput(GLFWwindow* window)
