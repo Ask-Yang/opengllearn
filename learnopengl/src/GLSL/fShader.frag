@@ -10,7 +10,7 @@ uniform float uniColor;
 
 void main()
 {
-	//FragColor = texture(texture1, TexCoord);
-	FragColor =  mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
+	FragColor = texture(texture1, TexCoord);
+	//FragColor =  mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
 	//FragColor = vec4(uniColor, 0, 0, 1);
 }

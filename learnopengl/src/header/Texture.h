@@ -16,7 +16,7 @@ public:
 	};
 
 public:
-	Texture2D(std::string texturePath);
+	Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO);
 	void use();
 	void use(int GL_TEXTURE_MACRO);
 	unsigned int getTextureID() {
@@ -26,7 +26,7 @@ public:
 	void setTextureWrapMode(WrapMode wm);
 	void setTextureFilterMode(FilterMode fm);
 private:
-	void bindGLTexture();
+	void bindGLTexture(unsigned int GL_COLOR_FORMAT_MACRO);
 
 	//std::shared_ptr<Shader> textureShader;
 

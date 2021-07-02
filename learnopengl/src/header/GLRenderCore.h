@@ -16,7 +16,7 @@ public:
 	void Init();
 	void Run();
 	void SetShader(std::string vertexShaderPath, std::string fragmentShaderPath);
-	std::shared_ptr<Texture2D> AddTexture(std::string texturePath);
+	std::shared_ptr<Texture2D> AddTexture(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO);
 private:
 	void processInput(GLFWwindow* window);
 	void initGLFW();

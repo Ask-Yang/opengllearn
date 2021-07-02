@@ -23,6 +23,7 @@
     <ClCompile Include="src\cpp\GLRenderCore.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
     <ClCompile Include="src\cpp\modelData.cpp" />
+    <ClCompile Include="src\cpp\officialImplementaion.cpp" />
     <ClCompile Include="src\cpp\Shader.cpp" />
     <ClCompile Include="src\cpp\stb_image_active.cpp" />
     <ClCompile Include="src\cpp\test.cpp" />
