@@ -40,17 +40,20 @@ void GLRenderCore::Run()
 {
 	while (!glfwWindowShouldClose(window))
 	{
+		processInput(window);
 		glClearColor(0.2f, 0.4f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		coreShader->use();
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		for(int i=0;i<coreTexture2dArr.size();i++)
+		{
+			coreTexture2dArr[i]->use(GL_TEXTURE0 + i);
+		}
 
-		processInput(window);
+		if(coreShader)
+			coreShader->use();
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -59,6 +62,12 @@ void GLRenderCore::Run()
 void GLRenderCore::SetShader(std::string vertexShaderPath, std::string fragmentShaderPath)
 {
 	coreShader = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
+	coreShader->setTexture("texture1", 3);
+}
+
+void GLRenderCore::AddTexture(std::string texturePath)
+{
+	coreTexture2dArr.push_back(make_shared<Texture2D>(texturePath));
 }
 
 void GLRenderCore::processInput(GLFWwindow* window)
@@ -102,11 +111,14 @@ void GLRenderCore::buildVAO()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
 	// 位置属性
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// 颜色属性
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 }
 
 
