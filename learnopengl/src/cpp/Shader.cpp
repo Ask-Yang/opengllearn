@@ -2,15 +2,16 @@
 
 using namespace std;
 
-Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
+Shader::Shader(string vertexPath, string fragmentPath)
 {
 	readShaderFileToString(vertexPath, fragmentPath);
 	compileVertexShader(m_vShaderString);
 	compileFragmentShader(m_fShaderString);
 	linkShaderProgram();
+	deleteShaderSource();
 }
 
-void Shader::readShaderFileToString(const GLchar* vertexPath, const GLchar* fragmentPath)
+void Shader::readShaderFileToString(string vertexPath, string fragmentPath)
 {
 	ifstream vShaderFile;
 	ifstream fShaderFile;
@@ -62,13 +63,16 @@ void Shader::linkShaderProgram()
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 	checkErrorInformation(shaderProgram, GL_LINK_STATUS);
-	
+
+	ID = shaderProgram;
+}
+
+void Shader::deleteShaderSource()
+{
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	m_vShaderString.clear();
 	m_fShaderString.clear();
-
-	ID = shaderProgram;
 }
 
 void Shader::checkErrorInformation(GLuint objectID, GLenum pname)

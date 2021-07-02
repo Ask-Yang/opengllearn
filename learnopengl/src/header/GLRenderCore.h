@@ -14,17 +14,17 @@ public:
 	~GLRenderCore();
 	void Init();
 	void Run();
+	void SetShader(std::string vertexShaderPath, std::string fragmentShaderPath);
 private:
 	void processInput(GLFWwindow* window);
 	void initGLFW();
 	void initWindow();
-	void initShader();
 	void buildVAO();
 
-	Shader ourShader;
-	unsigned int VAO;
-	unsigned int VBO;
-	unsigned int EBO;
+	std::shared_ptr<Shader> coreShader;
+	unsigned int VAO = 0;
+	unsigned int VBO = 0;
+	unsigned int EBO = 0;
 	std::vector<unsigned int> VBOarray;
 
 	GLFWwindow* window;

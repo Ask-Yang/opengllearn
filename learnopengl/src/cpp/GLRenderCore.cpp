@@ -33,7 +33,6 @@ void GLRenderCore::Init()
 		cout << "Failed to initialize GLAD" << endl;
 	}
 
-	initShader();
 	buildVAO();
 }
 
@@ -45,16 +44,21 @@ void GLRenderCore::Run()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glUseProgram(shaderProgram);
+		coreShader->use();
 		glBindVertexArray(VAO);
-		//glDrawArrays(GL_LINE_STRIP, 0, 4);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		processInput(window);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+}
+
+void GLRenderCore::SetShader(std::string vertexShaderPath, std::string fragmentShaderPath)
+{
+	coreShader = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
 }
 
 void GLRenderCore::processInput(GLFWwindow* window)
@@ -83,10 +87,6 @@ void GLRenderCore::initWindow()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 }
 
-void GLRenderCore::initShader()
-{
-	
-}
 
 void GLRenderCore::buildVAO()
 {
@@ -101,8 +101,12 @@ void GLRenderCore::buildVAO()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// 位置属性
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// 颜色属性
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 

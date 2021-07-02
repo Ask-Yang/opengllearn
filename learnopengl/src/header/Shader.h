@@ -8,7 +8,7 @@
 class Shader {
 public:
 	unsigned int ID;
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader(std::string vertexPath, std::string fragmentPath);
 
 	void use() {
 		glUseProgram(ID);
@@ -24,11 +24,12 @@ public:
 	}
 
 private:
-	void readShaderFileToString(const GLchar* vertexPath, const GLchar* fragmentPath);
+	void readShaderFileToString(std::string vertexPath, std::string fragmentPath);
 
 	void compileVertexShader(std::string &vShaderString);
 	void compileFragmentShader(std::string &fShaderString);
 	void linkShaderProgram();
+	void deleteShaderSource();
 	void checkErrorInformation(GLuint objectID, GLenum pname);
 
 	unsigned int shaderProgram = 0;
