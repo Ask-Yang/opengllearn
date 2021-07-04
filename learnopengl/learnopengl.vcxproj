@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\Camera.cpp" />
     <ClCompile Include="src\cpp\glad.c" />
     <ClCompile Include="src\cpp\GLRenderCore.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\Camera.h" />
     <ClInclude Include="src\header\GLRenderCore.h" />
     <ClInclude Include="src\header\Shader.h" />
     <ClInclude Include="src\header\Texture.h" />

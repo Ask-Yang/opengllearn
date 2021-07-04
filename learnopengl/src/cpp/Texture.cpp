@@ -29,6 +29,7 @@ void Texture2D::use(int GL_TEXTURE_MACRO)
 
 void Texture2D::setTextureWrapMode(WrapMode wm)
 {
+	glBindTexture(GL_TEXTURE_2D, texture);
 	textureWrapMode = wm;
 	if (textureWrapMode == WrapMode::Repeat)
 	{
