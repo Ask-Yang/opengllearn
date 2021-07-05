@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\RPLight.cpp" />
+    <ClCompile Include="src\cpp\RPCube.cpp" />
+    <ClCompile Include="src\cpp\RenderPass.cpp" />
     <ClCompile Include="src\cpp\Camera.cpp" />
     <ClCompile Include="src\cpp\glad.c" />
     <ClCompile Include="src\cpp\GLRenderCore.cpp" />
@@ -31,6 +34,9 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\RPLight.h" />
+    <ClInclude Include="src\header\RPCube.h" />
+    <ClInclude Include="src\header\RenderPass.h" />
     <ClInclude Include="src\header\Camera.h" />
     <ClInclude Include="src\header\GLRenderCore.h" />
     <ClInclude Include="src\header\Shader.h" />

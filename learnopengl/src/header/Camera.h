@@ -18,22 +18,16 @@ public:
 	Camera(glm::vec3 cameraPos, glm::vec3 lookAtPoint, glm::vec3 worldUp);
 	void cameraMovement(CameraMovement movement, float deltaTime);
 	void cameraMouseMovement(float mouseXOffset, float mouseYOffset);
+	void cameraMouseScroll(float yoffset);
 	void cameraEulaTransform(float pitch, float yaw);
-	glm::mat4 getViewMatrix() {
-		return lookAt(m_cameraPos, m_cameraFront + m_cameraPos, m_cameraUp);
-	}
+	glm::mat4 getViewMatrix();
+
 	float getFov() {
 		return m_fov;
 	}
-	void cameraMouseScroll(float yoffset) {
-		m_fov -= (float)yoffset;
-		if (m_fov < 1.0f)
-			m_fov = 1.0f;
-		if (m_fov > 45.0f)
-			m_fov = 45.0f;
-	}
+	
 private:
-	float m_fov = 30.0f;
+	float m_fov = 45.0f;
 	glm::vec3 m_cameraPos;
 	glm::vec3 m_worldUp;
 	glm::vec3 m_cameraFront;

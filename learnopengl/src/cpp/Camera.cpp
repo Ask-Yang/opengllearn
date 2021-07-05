@@ -31,7 +31,7 @@ void Camera::cameraMouseMovement(float mouseXOffset, float mouseYOffset)
 {
 	m_pitch += mouseYOffset * m_cameraPitchSensitivity;
 	m_yaw += mouseXOffset * m_cameraYawSensitivity;
-	if (m_pitch > 89.0f)
+ 	if (m_pitch > 89.0f)
 		m_pitch = 89.0f;
 	if (m_pitch < -89.0f)
 		m_pitch = -89.0f;
@@ -48,6 +48,20 @@ void Camera::cameraEulaTransform(float pitch, float yaw)
 	m_cameraFront = normalize(m_cameraFront);
 	m_cameraRight = normalize(cross(m_worldUp , -m_cameraFront));
 	m_cameraUp = normalize(cross(-m_cameraFront, m_cameraRight));
+}
+
+glm::mat4 Camera::getViewMatrix()
+{
+	return lookAt(m_cameraPos, m_cameraFront + m_cameraPos, m_cameraUp);
+}
+
+void Camera::cameraMouseScroll(float yoffset)
+{
+	m_fov -= (float)yoffset;
+	if (m_fov < 1.0f)
+		m_fov = 1.0f;
+	if (m_fov > 45.0f)
+		m_fov = 45.0f;
 }
 
 glm::mat4 Camera::lookAt(vec3 cameraPos, vec3 lookAtPoint, vec3 worldUp)

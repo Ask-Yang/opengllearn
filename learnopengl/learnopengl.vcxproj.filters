@@ -45,6 +45,15 @@
     <ClCompile Include="src\cpp\Camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\RenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\RPCube.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\RPLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\GLRenderCore.h">
@@ -57,6 +66,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\RenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\RPCube.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\RPLight.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

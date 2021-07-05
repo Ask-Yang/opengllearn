@@ -11,6 +11,41 @@ Shader::Shader(string vertexPath, string fragmentPath)
 	deleteShaderSource();
 }
 
+void Shader::use() 
+{
+	glUseProgram(ID);
+}
+void Shader::setBool(const std::string shaderVariableName, bool value) 
+{
+	use();
+	glUniform1i(glGetUniformLocation(ID, shaderVariableName.c_str()), (int)value);
+}
+void Shader::setTexture(const std::string shaderVariableName, int textureSlotNumber) 
+{
+	use();
+	glUniform1i(glGetUniformLocation(ID, shaderVariableName.c_str()), textureSlotNumber);
+}
+void Shader::setInt(const std::string shaderVariableName, int value) 
+{
+	use();
+	glUniform1i(glGetUniformLocation(ID, shaderVariableName.c_str()), value);
+}
+void Shader::setFloat(const std::string shaderVariableName, float value) 
+{
+	use();
+	glUniform1f(glGetUniformLocation(ID, shaderVariableName.c_str()), value);
+}
+void Shader::setMat4(std::string shaderVariableName, glm::mat4 matrix) 
+{
+	use();
+	glUniformMatrix4fv(glGetUniformLocation(ID, shaderVariableName.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+void Shader::setVec3(const std::string shaderVariableName, float value1, float value2, float valu3) 
+{
+	use();
+	glUniform3f(glGetUniformLocation(ID, shaderVariableName.c_str()), value1, value2, valu3);
+}
+
 void Shader::readShaderFileToString(string vertexPath, string fragmentPath)
 {
 	ifstream vShaderFile;

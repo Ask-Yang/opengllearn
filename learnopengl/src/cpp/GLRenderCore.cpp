@@ -9,7 +9,7 @@ extern unsigned int indices[];
 extern unsigned int indicesSize;
 extern vec3 cubePositions[];
 
-static Camera camera(vec3(0, 0, 3), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
+static Camera camera(vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
 // 可能的视线：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
 static bool sg_FirstMouse = true;
 static float sg_lastFrameTime = 0.0f;
@@ -54,13 +54,10 @@ void GLRenderCore::Init()
 {
 	initGLFW();
 	initWindow();
-
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))  // 必须要先创建窗口才能调用glad
-	{
 		cout << "Failed to initialize GLAD" << endl;
-	}
 
-	buildVAO();
+	initScence();
 }
 
 void GLRenderCore::Run()
@@ -70,53 +67,31 @@ void GLRenderCore::Run()
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		updateMVPMatrix();
 
 		for(int i=0;i<coreTexture2dArr.size();i++)
-		{
 			coreTexture2dArr[i]->use(GL_TEXTURE0 + i);
-		}
-		if(coreShader)
-			coreShader->use();
 
-		mat4 model = mat4(1.0f);
-		mat4 view = camera.getViewMatrix();
-		mat4 projection = perspective(radians(camera.getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
-		//coreShader->setMat4("model", model);
-		coreShader->setMat4("view", view);
-		coreShader->setMat4("projection", projection);
+		for (auto& renderPass : coreRenderPassArr)
+			renderPass->use();
 
-		glBindVertexArray(VAO);
-		
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			model = translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			coreShader->setMat4("model", model);
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		
-	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
 
-void GLRenderCore::SetShader(std::string vertexShaderPath, std::string fragmentShaderPath)
-{
-	coreShader = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
-	coreShader->use();
 
-	coreShader->setTexture("texture1", 0);
-	coreShader->setTexture("texture2", 1);
-}
 
 shared_ptr<Texture2D> GLRenderCore::AddTexture(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
 {
 	coreTexture2dArr.push_back(make_shared<Texture2D>(texturePath, GL_COLOR_FORMAT_MACRO));
 	return coreTexture2dArr.back();
+}
+
+void GLRenderCore::enableDepthTest()
+{
+		glEnable(GL_DEPTH_TEST);
 }
 
 void GLRenderCore::processInput(GLFWwindow* window)
@@ -162,29 +137,27 @@ void GLRenderCore::initWindow()
 	glfwSetScrollCallback(window, scroll_callback);
 }
 
-
-void GLRenderCore::buildVAO()
+void GLRenderCore::initScence()
 {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	//glGenBuffers(1, &EBO);
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
-
-	// 位置属性
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	//// 颜色属性
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	shared_ptr<RenderPass> lightPassPtr = make_shared<RPLight>();
+	shared_ptr<RenderPass> cubePassPtr = make_shared<RPCube>();
+	
+	coreRenderPassArr.push_back(lightPassPtr);
+	coreRenderPassArr.push_back(cubePassPtr);
+	
 }
+
+void GLRenderCore::updateMVPMatrix()
+{
+	mat4 view = camera.getViewMatrix();
+	mat4 projection = perspective(radians(camera.getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
+	for (auto& renderPass : coreRenderPassArr)
+	{
+		renderPass->setViewMatrix(view);
+		renderPass->setProjectionMatrix(projection);
+	}
+}
+
+
 
 
