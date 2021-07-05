@@ -9,8 +9,8 @@ extern unsigned int indices[];
 extern unsigned int indicesSize;
 extern vec3 cubePositions[];
 
-static Camera camera(vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
-// 可能的视线：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
+static Camera camera(vec3(4, 0, 4), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
+// 可能的实现：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
 static bool sg_FirstMouse = true;
 static float sg_lastFrameTime = 0.0f;
 static float sg_lastMouseX = 0.0f;
@@ -69,6 +69,7 @@ void GLRenderCore::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		updateMVPMatrix();
+		coreRenderPassArr[1]->getShader()->setVec3("viewPos", camera.getCameraPosition());
 
 		for(int i=0;i<coreTexture2dArr.size();i++)
 			coreTexture2dArr[i]->use(GL_TEXTURE0 + i);
@@ -80,8 +81,6 @@ void GLRenderCore::Run()
 		glfwPollEvents();
 	}
 }
-
-
 
 shared_ptr<Texture2D> GLRenderCore::AddTexture(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
 {

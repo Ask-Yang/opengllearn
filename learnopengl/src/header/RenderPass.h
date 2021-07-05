@@ -20,6 +20,9 @@ public:
 	void setModelMatrix(glm::mat4 model);
 	void setViewMatrix(glm::mat4 view);
 	void setProjectionMatrix(glm::mat4 projection);
+	std::shared_ptr<Shader> getShader() {
+		return coreShader;
+	}
 protected:
 	virtual void initVAO() = 0;
 	virtual void initShader() = 0;

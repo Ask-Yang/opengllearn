@@ -5,7 +5,7 @@
 
 #include <vector>
 
-class Camera
+class Camera // the constructor parameter are cameraPos, lookAtPoint, worldUp, be careful!
 {
 public:
 	enum class CameraMovement{
@@ -15,7 +15,7 @@ public:
 		RIGHT
 	};
 public:
-	Camera(glm::vec3 cameraPos, glm::vec3 lookAtPoint, glm::vec3 worldUp);
+	Camera(glm::vec3 cameraPos, glm::vec3 lookAtPoint, glm::vec3 worldUp); 
 	void cameraMovement(CameraMovement movement, float deltaTime);
 	void cameraMouseMovement(float mouseXOffset, float mouseYOffset);
 	void cameraMouseScroll(float yoffset);
@@ -24,6 +24,9 @@ public:
 
 	float getFov() {
 		return m_fov;
+	}
+	glm::vec3 getCameraPosition() {
+		return m_cameraPos;
 	}
 	
 private:
@@ -34,7 +37,7 @@ private:
 	glm::vec3 m_cameraUp;
 	glm::vec3 m_cameraRight;
 	float m_pitch = 0.0f;
-	float m_yaw = -90.0f;
+	float m_yaw = -135.0f;
 	float m_cameraMoveSpeed = 1.0f;
 	float m_cameraPitchSensitivity = 0.1f;
 	float m_cameraYawSensitivity = 0.1f;

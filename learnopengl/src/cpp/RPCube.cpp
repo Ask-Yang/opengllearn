@@ -22,8 +22,10 @@ void RPCube::initVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 void RPCube::initShader()
@@ -31,6 +33,7 @@ void RPCube::initShader()
 	coreShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 	coreShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	coreShader->setMat4("model", glm::mat4(1.0f));
+	coreShader->setVec3("lightPos", 1.2f, 1.0f, 2.0f);
 }
 
 void RPCube::setDrawMode()

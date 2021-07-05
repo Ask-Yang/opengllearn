@@ -35,7 +35,7 @@ void Shader::setFloat(const std::string shaderVariableName, float value)
 	use();
 	glUniform1f(glGetUniformLocation(ID, shaderVariableName.c_str()), value);
 }
-void Shader::setMat4(std::string shaderVariableName, glm::mat4 matrix) 
+void Shader::setMat4(const std::string shaderVariableName, glm::mat4 matrix)
 {
 	use();
 	glUniformMatrix4fv(glGetUniformLocation(ID, shaderVariableName.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
@@ -44,6 +44,12 @@ void Shader::setVec3(const std::string shaderVariableName, float value1, float v
 {
 	use();
 	glUniform3f(glGetUniformLocation(ID, shaderVariableName.c_str()), value1, value2, valu3);
+}
+
+void Shader::setVec3(const std::string shaderVariableName, glm::vec3 vec)
+{
+	use();
+	glUniform3f(glGetUniformLocation(ID, shaderVariableName.c_str()), vec.x, vec.y, vec.z);
 }
 
 void Shader::readShaderFileToString(string vertexPath, string fragmentPath)

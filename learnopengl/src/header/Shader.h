@@ -19,8 +19,9 @@ public:
 	void setTexture(const std::string shaderVariableName, int textureSlotNumber);
 	void setInt(const std::string shaderVariableName, int value);
 	void setFloat(const std::string shaderVariableName, float value);
-	void setMat4(std::string shaderVariableName, glm::mat4 matrix);
+	void setMat4(const std::string shaderVariableName, glm::mat4 matrix);
 	void setVec3(const std::string shaderVariableName, float value1, float value2, float valu3);
+	void setVec3(const std::string shaderVariableName, glm::vec3 vec);
 private:
 	void readShaderFileToString(std::string vertexPath, std::string fragmentPath);
 	void compileVertexShader(std::string &vShaderString);
