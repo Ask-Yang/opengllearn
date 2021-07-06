@@ -7,31 +7,39 @@
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Camera.h"
+#include <map>
 #include <vector>
 #include <iostream>
+#include <string>
+#include <vector>
+class GLRenderCore;
 
 class RenderPass
 {
 public:
+	RenderPass(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
+	
 	virtual void init() = 0;
 	void use();
-	void setMVPMatrix(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+	void addPassTexture(std::string textureName);
+	Shader& getPassShader() {
+		return passShader;
+	}
 	void setModelMatrix(glm::mat4 model);
 	void setViewMatrix(glm::mat4 view);
 	void setProjectionMatrix(glm::mat4 projection);
-	std::shared_ptr<Shader> getShader() {
-		return coreShader;
-	}
+private:
+	GLRenderCore& renderCore;
 protected:
 	virtual void initVAO() = 0;
 	virtual void initShader() = 0;
 	virtual void setDrawMode() = 0;
-	void setShader(std::string vertexShaderPath, std::string fragmentShaderPath);
+protected:
+	Shader& passShader;
+	std::map<std::string, unsigned int> passTextureArr;
 
-	std::shared_ptr<Shader> coreShader;
 	unsigned int VAO = 0;
 	unsigned int VBO = 0;
-	unsigned int EBO = 0;
+	
 };
 

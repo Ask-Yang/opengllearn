@@ -56,7 +56,7 @@ void GLRenderCore::Init()
 	initWindow();
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))  // 必须要先创建窗口才能调用glad
 		cout << "Failed to initialize GLAD" << endl;
-
+	initResource();
 	initScence();
 }
 
@@ -69,27 +69,46 @@ void GLRenderCore::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		currentFrameObjectUpdate();
-
-		for(int i=0;i<coreTexture2dArr.size();i++)
-			coreTexture2dArr[i]->use(GL_TEXTURE0 + i);
-
 		for (auto& renderPass : coreRenderPassArr)
-			renderPass->use();
+			renderPass.second->use();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
 
-shared_ptr<Texture2D> GLRenderCore::AddTexture(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
+std::string GLRenderCore::addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath)
 {
-	coreTexture2dArr.push_back(make_shared<Texture2D>(texturePath, GL_COLOR_FORMAT_MACRO));
-	return coreTexture2dArr.back();
+	coreShaderArr[shaderName] = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
+	return shaderName;
 }
+
+string GLRenderCore::addTexture(string textureName, std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
+{
+	coreTexture2dArr[textureName] = make_shared<Texture2D>(texturePath, GL_COLOR_FORMAT_MACRO);
+	return textureName;
+}
+
+std::string GLRenderCore::addVBO(std::string VBOName, float* vertices, unsigned int verticesSize)
+{
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
+	coreVBOArr[VBOName] = VBO;
+	return VBOName;
+}
+
+
 
 void GLRenderCore::enableDepthTest()
 {
 		glEnable(GL_DEPTH_TEST);
+}
+
+void GLRenderCore::enableTexture(std::string textureName)
+{
+	coreTexture2dArr[textureName]->use();
 }
 
 void GLRenderCore::processInput(GLFWwindow* window)
@@ -137,12 +156,37 @@ void GLRenderCore::initWindow()
 
 void GLRenderCore::initScence()
 {
-	shared_ptr<RenderPass> lightPassPtr = make_shared<RPLight>();
-	shared_ptr<RenderPass> cubePassPtr = make_shared<RPCube>();
-	
-	coreRenderPassArr.push_back(lightPassPtr);
-	coreRenderPassArr.push_back(cubePassPtr);
-	
+	shared_ptr<RenderPass> lightPassPtr = make_shared<RPLight>(*this, "LightShader", "CubeVBO");
+	shared_ptr<RenderPass> cubePassPtr = make_shared<RPCube>(*this, "CubeShader", "CubeVBO");
+	cubePassPtr->addPassTexture("objectDiffuse");
+	cubePassPtr->addPassTexture("objectSpecular");
+
+	coreRenderPassArr["LightPass"] = lightPassPtr;
+	coreRenderPassArr["CubePass"] = cubePassPtr;
+}
+
+void GLRenderCore::initResource()
+{
+	initVBO();
+	initShader();
+	initTexture();
+}
+
+void GLRenderCore::initVBO()
+{
+	addVBO("CubeVBO", vertices, verticesSize);
+}
+
+void GLRenderCore::initTexture()
+{
+	addTexture("objectDiffuse", "./resources/textures/container2.png", GL_RGBA);
+	addTexture("objectSpecular", "./resources/textures/container2_specular.png", GL_RGBA);
+}
+
+void GLRenderCore::initShader()
+{
+	addShaderProgram("CubeShader", "./src/GLSL/vShader.vert", "./src/GLSL/fShader.frag");
+	addShaderProgram("LightShader", "./src/GLSL/vShader.vert", "./src/GLSL/light.frag");
 }
 
 void GLRenderCore::updateMVPMatrix()
@@ -151,20 +195,20 @@ void GLRenderCore::updateMVPMatrix()
 	mat4 projection = perspective(radians(camera.getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
 	for (auto& renderPass : coreRenderPassArr)
 	{
-		renderPass->setViewMatrix(view);
-		renderPass->setProjectionMatrix(projection);
+		renderPass.second->setViewMatrix(view);
+		renderPass.second->setProjectionMatrix(projection);
 	}
 }
 
 void GLRenderCore::currentFrameObjectUpdate()
 {
 	updateMVPMatrix();
-	coreRenderPassArr[1]->getShader()->setVec3("viewPos", camera.getCameraPosition());
-	glm::vec3 lightColor;
-	lightColor.x = sin(glfwGetTime() * 2.0f);
-	lightColor.y = sin(glfwGetTime() * 0.7f);
-	lightColor.z = sin(glfwGetTime() * 1.3f);
-	coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
+	coreRenderPassArr["CubePass"]->getPassShader().setVec3("viewPos", camera.getCameraPosition());
+	//glm::vec3 lightColor;
+	//lightColor.x = sin(glfwGetTime() * 2.0f);
+	//lightColor.y = sin(glfwGetTime() * 0.7f);
+	//lightColor.z = sin(glfwGetTime() * 1.3f);
+	//coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
 }
 
 

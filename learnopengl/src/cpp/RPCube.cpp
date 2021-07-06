@@ -1,52 +1,51 @@
 #include "RPCube.h"
+
 extern float vertices[];
 extern unsigned int verticesSize;
 
-RPCube::RPCube()
+
+RPCube::RPCube(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+	:RenderPass(renderCoreIn, shaderName, VBOName)
 {
 	init();
 }
 
 void RPCube::init()
 {
-	setShader("./src/GLSL/vShader.vert", "./src/GLSL/fShader.frag");
 	initVAO();
 	initShader();
 }
 
 void RPCube::initVAO()
 {
-	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 }
 
 void RPCube::initShader()
 {
-	glm::vec3 lightColor;
-	lightColor.x = sin(glfwGetTime() * 2.0f);
-	lightColor.y = sin(glfwGetTime() * 0.7f);
-	lightColor.z = sin(glfwGetTime() * 1.3f);
+	glm::vec3 lightColor(1,1,1);
 
-	coreShader->setMat4("model", glm::mat4(1.0f));
+	passShader.setMat4("model", glm::mat4(1.0f));
 
-	coreShader->setVec3("material.objectAmbient", 1.0f, 0.5f, 0.31f);
-	coreShader->setVec3("material.objectDiffuse", 1.0f, 0.5f, 0.31f);
-	coreShader->setVec3("material.objectSpecular", 0.5f, 0.5f, 0.5f);
-	coreShader->setFloat("material.shininess", 32.0f);
+	passShader.setTexture("material.objectDiffuse", passTextureArr["objectDiffuse"]);
+	passShader.setTexture("material.objectSpecular", passTextureArr["objectSpecular"]);
 
-	coreShader->setVec3("lightColor", lightColor);
-	coreShader->setVec3("light.position", -1.2f, 1.0f, 2.0f);
-	coreShader->setVec3("light.ambientStrength", 0.2f, 0.2f, 0.2f);
-	coreShader->setVec3("light.diffuseStrength", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
-	coreShader->setVec3("light.specularStrength", 1.0f, 1.0f, 1.0f);
+	passShader.setFloat("material.shininess", 32.0f);
+
+	passShader.setVec3("lightColor", lightColor);
+	passShader.setVec3("light.position", -1.2f, 1.0f, 2.0f);
+	passShader.setVec3("light.ambientStrength", 0.2f, 0.2f, 0.2f);
+	passShader.setVec3("light.diffuseStrength", 0.5f, 0.5f, 0.5f); 
+	passShader.setVec3("light.specularStrength", 1.0f, 1.0f, 1.0f);
 }
 
 void RPCube::setDrawMode()

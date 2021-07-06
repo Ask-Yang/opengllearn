@@ -4,7 +4,7 @@ class RPCube :
     public RenderPass
 {
 public:
-    RPCube();
+    RPCube(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
     void init();
 private:
     void initVAO();

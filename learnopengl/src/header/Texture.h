@@ -21,13 +21,17 @@ public:
 	void use(int GL_TEXTURE_MACRO);
 	void setTextureWrapMode(WrapMode wm);
 	void setTextureFilterMode(FilterMode fm);
-
+	unsigned int getTextureSlot() {
+		return current_gl_texture_macro - GL_TEXTURE0;
+	}
 	unsigned int getTextureID() {
 		return texture;
 	}
 private:
 	void bindGLTexture(unsigned int GL_COLOR_FORMAT_MACRO);
 private:
+	static unsigned int gl_texture_macro_index;
+	unsigned int current_gl_texture_macro = 0;
 	unsigned int texture = 0;
 	WrapMode textureWrapMode = WrapMode::Default;
 	FilterMode textureFilterMode = FilterMode::Default;

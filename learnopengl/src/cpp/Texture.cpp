@@ -1,7 +1,10 @@
 #include "Texture.h"
 
+unsigned int Texture2D::gl_texture_macro_index = GL_TEXTURE0;
+
 Texture2D::Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
 {
+	current_gl_texture_macro = gl_texture_macro_index++;
 	stbi_set_flip_vertically_on_load(true);
 	data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
 	if (!data)
@@ -17,6 +20,7 @@ Texture2D::Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO
 
 void Texture2D::use()
 {
+	glActiveTexture(current_gl_texture_macro);
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 

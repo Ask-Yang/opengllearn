@@ -4,7 +4,7 @@ class RPLight :
     public RenderPass
 {
 public:
-    RPLight();
+    RPLight(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
     void init();
 private:
     void initVAO();

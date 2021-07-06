@@ -1,36 +1,41 @@
 #include "RenderPass.h"
+#include "GLRenderCore.h"
 using namespace std;
 
-void RenderPass::setShader(std::string vertexShaderPath, std::string fragmentShaderPath)
+
+RenderPass::RenderPass(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+	:renderCore(renderCoreIn),
+	passShader(*(renderCoreIn.getShaderProgram(shaderName)))
 {
-	coreShader = make_shared<Shader>(vertexShaderPath, fragmentShaderPath);
+	VBO = renderCore.getVBO(VBOName);
 }
 
-void RenderPass::use()
+void RenderPass::addPassTexture(std::string textureName)
 {
-	coreShader->use();
-	glBindVertexArray(VAO);
-	setDrawMode();
-}
-
-void RenderPass::setMVPMatrix(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
-{
-	coreShader->setMat4("model", model);
-	coreShader->setMat4("view", view);
-	coreShader->setMat4("projection", projection);
+	passTextureArr[textureName] = renderCore.getTexture(textureName)->getTextureID();
 }
 
 void RenderPass::setModelMatrix(glm::mat4 model)
 {
-	coreShader->setMat4("model", model);
+	passShader.setMat4("model", model);
 }
 
 void RenderPass::setViewMatrix(glm::mat4 view)
 {
-	coreShader->setMat4("view", view);
+	passShader.setMat4("view", view);
 }
 
 void RenderPass::setProjectionMatrix(glm::mat4 projection)
 {
-	coreShader->setMat4("projection", projection);
+	passShader.setMat4("projection", projection);
 }
+
+void RenderPass::use()
+{
+	for (auto& passTexture : passTextureArr)
+		renderCore.getTexture(passTexture.first)->use();
+	passShader.use();
+	glBindVertexArray(VAO);
+	setDrawMode();
+}
+

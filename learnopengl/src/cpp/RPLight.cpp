@@ -3,27 +3,27 @@
 extern float vertices[];
 extern unsigned int verticesSize;
 
-RPLight::RPLight()
+
+
+RPLight::RPLight(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+	:RenderPass(renderCoreIn, shaderName, VBOName)
 {
 	init();
 }
 
 void RPLight::init()
 {
-	setShader("./src/GLSL/vShader.vert", "./src/GLSL/light.frag");
 	initVAO();
 	initShader();
 }
 
 void RPLight::initVAO()
 {
-	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 }
 
@@ -33,7 +33,7 @@ void RPLight::initShader()
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(0.2f));
-	coreShader->setMat4("model", model);
+	passShader.setMat4("model", model);
 }
 
 void RPLight::setDrawMode()
