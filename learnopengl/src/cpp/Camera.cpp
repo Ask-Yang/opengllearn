@@ -13,6 +13,7 @@ Camera::Camera(vec3 cameraPos,vec3 lookAtPoint, vec3 worldUp)
 	m_cameraFront = -camera_z;
 	m_cameraUp = camera_y;
 	m_cameraRight = camera_x;
+
 }
 
 void Camera::cameraMovement(CameraMovement movement, float deltaTime)

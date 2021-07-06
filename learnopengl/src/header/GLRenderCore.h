@@ -33,6 +33,7 @@ private:
 	void initWindow();
 	void initScence();
 	void updateMVPMatrix();
+	void currentFrameObjectUpdate();
 
 private:
 	const unsigned int screenWidth = 800;

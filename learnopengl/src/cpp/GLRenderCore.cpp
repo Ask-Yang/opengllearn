@@ -65,11 +65,10 @@ void GLRenderCore::Run()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		updateMVPMatrix();
-		coreRenderPassArr[1]->getShader()->setVec3("viewPos", camera.getCameraPosition());
+		currentFrameObjectUpdate();
 
 		for(int i=0;i<coreTexture2dArr.size();i++)
 			coreTexture2dArr[i]->use(GL_TEXTURE0 + i);
@@ -155,6 +154,17 @@ void GLRenderCore::updateMVPMatrix()
 		renderPass->setViewMatrix(view);
 		renderPass->setProjectionMatrix(projection);
 	}
+}
+
+void GLRenderCore::currentFrameObjectUpdate()
+{
+	updateMVPMatrix();
+	coreRenderPassArr[1]->getShader()->setVec3("viewPos", camera.getCameraPosition());
+	glm::vec3 lightColor;
+	lightColor.x = sin(glfwGetTime() * 2.0f);
+	lightColor.y = sin(glfwGetTime() * 0.7f);
+	lightColor.z = sin(glfwGetTime() * 1.3f);
+	coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
 }
 
 

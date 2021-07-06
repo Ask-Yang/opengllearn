@@ -29,7 +29,7 @@ void RPLight::initVAO()
 
 void RPLight::initShader()
 {
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightPos(-1.2f, 1.0f, 2.0f);
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(0.2f));
