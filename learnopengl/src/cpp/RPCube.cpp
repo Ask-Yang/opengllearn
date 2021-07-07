@@ -1,8 +1,9 @@
 #include "RPCube.h"
+#include "lightStruct.h"
 
 extern float vertices[];
 extern unsigned int verticesSize;
-
+extern glm::vec3 pointLightPositions[];
 
 RPCube::RPCube(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
 	:RenderPass(renderCoreIn, shaderName, VBOName)
@@ -33,19 +34,28 @@ void RPCube::initVAO()
 void RPCube::initShader()
 {
 	glm::vec3 lightColor(1,1,1);
-
-	passShader.setMat4("model", glm::mat4(1.0f));
-
+	passShader.setVec3("lightColor", lightColor);
 	passShader.setTexture("material.objectDiffuse", passTextureArr["objectDiffuse"]);
 	passShader.setTexture("material.objectSpecular", passTextureArr["objectSpecular"]);
-
 	passShader.setFloat("material.shininess", 32.0f);
+	
+	DirLight dirLight("dirLight");
+	dirLight.bindVariableToShader(passShader);
+	PointLight pointLight0("pointLights[0]");
+	pointLight0.bindVariableToShader(passShader);
+	PointLight pointLight1("pointLights[1]");
+	pointLight1.bindVariableToShader(passShader);
+	PointLight pointLight2("pointLights[2]");
+	pointLight2.bindVariableToShader(passShader);
+	PointLight pointLight3("pointLights[3]");
+	pointLight3.bindVariableToShader(passShader);
+	SpotLight spotLight("spotLight");
+	spotLight.bindVariableToShader(passShader);
 
-	passShader.setVec3("lightColor", lightColor);
-	passShader.setVec3("light.position", -1.2f, 1.0f, 2.0f);
-	passShader.setVec3("light.ambientStrength", 0.2f, 0.2f, 0.2f);
-	passShader.setVec3("light.diffuseStrength", 0.5f, 0.5f, 0.5f); 
-	passShader.setVec3("light.specularStrength", 1.0f, 1.0f, 1.0f);
+	passShader.setVec3("pointLight[0].position", pointLightPositions[0]);
+	passShader.setVec3("pointLight[1].position", pointLightPositions[1]);
+	passShader.setVec3("pointLight[2].position", pointLightPositions[2]);
+	passShader.setVec3("pointLight[3].position", pointLightPositions[3]);
 }
 
 void RPCube::setDrawMode()

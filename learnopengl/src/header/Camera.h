@@ -28,7 +28,9 @@ public:
 	glm::vec3 getCameraPosition() {
 		return m_cameraPos;
 	}
-	
+	glm::vec3 getCameraFront() {
+		return m_cameraFront;
+	}
 private:
 	float m_fov = 45.0f;
 	glm::vec3 m_cameraPos;

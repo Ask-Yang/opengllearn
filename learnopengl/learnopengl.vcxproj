@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\lightStruct.cpp" />
+    <ClCompile Include="src\cpp\RPPointLight.cpp" />
     <ClCompile Include="src\cpp\RPLight.cpp" />
     <ClCompile Include="src\cpp\RPCube.cpp" />
     <ClCompile Include="src\cpp\RenderPass.cpp" />
@@ -34,6 +36,8 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\RPPointLight.h" />
+    <ClInclude Include="src\header\lightStruct.h" />
     <ClInclude Include="src\header\RPLight.h" />
     <ClInclude Include="src\header\RPCube.h" />
     <ClInclude Include="src\header\RenderPass.h" />

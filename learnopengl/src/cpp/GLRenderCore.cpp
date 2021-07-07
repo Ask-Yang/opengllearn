@@ -8,6 +8,7 @@ extern unsigned int verticesSize;
 extern unsigned int indices[];
 extern unsigned int indicesSize;
 extern vec3 cubePositions[];
+extern vec3 pointLightPositions[];
 
 static Camera camera(vec3(4, 0, 4), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
 // 可能的实现：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
@@ -69,9 +70,28 @@ void GLRenderCore::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		currentFrameObjectUpdate();
-		for (auto& renderPass : coreRenderPassArr)
-			renderPass.second->use();
-
+		//for (auto& renderPass : coreRenderPassArr)
+		//	renderPass.second->use();
+		for (int i = 0; i < 10; i++)
+		{
+			mat4 model(1.0f);
+			model = translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = rotate(model, radians(angle), vec3(1.0f, 0.3f, 0.5f));
+			mat4 normalTransformMatrix = transpose(inverse(model));
+			coreRenderPassArr["CubePass"]->getPassShader().setMat4("normal", normalTransformMatrix);
+			coreRenderPassArr["CubePass"]->getPassShader().setMat4("model", model);
+			coreRenderPassArr["CubePass"]->use();
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			mat4 model(1.0f);
+			model = translate(model, pointLightPositions[i]);
+			model = scale(model, vec3(0.2f));
+			coreRenderPassArr["LightPass"]->getPassShader().setMat4("model", model);
+			coreRenderPassArr["LightPass"]->use();
+		}
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -204,6 +224,8 @@ void GLRenderCore::currentFrameObjectUpdate()
 {
 	updateMVPMatrix();
 	coreRenderPassArr["CubePass"]->getPassShader().setVec3("viewPos", camera.getCameraPosition());
+	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.position", camera.getCameraPosition());
+	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.direction", camera.getCameraFront());
 	//glm::vec3 lightColor;
 	//lightColor.x = sin(glfwGetTime() * 2.0f);
 	//lightColor.y = sin(glfwGetTime() * 0.7f);

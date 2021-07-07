@@ -5,10 +5,10 @@ class RPLight :
 {
 public:
     RPLight(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
-    void init();
+    void init() override; 
 private:
-    void initVAO();
-    void initShader();
-    void setDrawMode();
+    void initVAO() override;
+    virtual void initShader() override;
+    void setDrawMode() override;
 };
 
