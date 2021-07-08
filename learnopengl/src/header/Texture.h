@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "stb_image.h"
 #include "Shader.h"
+
 class Texture2D
 {
 public:
@@ -16,7 +17,9 @@ public:
 	};
 
 public:
-	Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO);
+	std::string path;
+	std::string type;
+	Texture2D(std::string texturePath);
 	void use();
 	void use(int GL_TEXTURE_MACRO);
 	void setTextureWrapMode(WrapMode wm);

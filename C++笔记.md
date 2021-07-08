@@ -20,15 +20,13 @@
 
 ### 2、 raw pointer, smart pointer , reference
 
-smart pointer should be used in the case that you own this object,
+只要是需要动态分配的对象就可以用智能指针。智能指针就是为了方便管理内存而生的，不会有有个地方用了智能指针而它指向的内存却为空这种情况（这是原始指针最大的缺点）（只要你规范的使用智能指针，不随意将它转换成原始指针）。
 
-the reference should be used in the case that you don't own this object, and you won't change the reference, and can not be null.
+一个类拥有一个不属于它的成员最好用引用，因为引用必须要在构造函数中赋值，这就明确了引用的生命期。
 
-raw pointer for object you don't own but you want to change it in some cases. The better implementation for that case maybe use polymorphism（多态）.
+最好不要用指针，除非是在写c。
 
-总而言之，内存分配的时候用智能指针，如果是需要一个对象，那么用引用。能不用就不用吧。指针最大的问题就是它可以为空吧，所以我们要避免制造一个不知道是否存在的怪物，以降低程序出错的可能性，为此，如果真到必须使用指针的时候，也就是允许nullptr的时候，我们应该首先检查我们的类设计才对。给每个对象一个明确的生命期，可能是使用C++时最应该注意的事情。
 
-java的reference可以更改？java是定义一个引用，然后必须要在构造函数里初始化，只不过可以放在构造函数体里，而不是使用初始化列表。
 
 ### 3、 基类、派生类
 
@@ -102,4 +100,57 @@ c* p = new d(2);
 先按基类声明顺序从左到右构造基类，再构造派生类。
 
 先按成员变量声明顺序从上到下构造成员变量，再调用类自身构造函数。
+
+### 4、函数定义和声明不兼容
+
+没加命名空间。有时候编译器不报错。
+
+### 5、访问限定符和继承
+
+```c++
+class a {
+public:
+	void Init()
+	{
+		cout << "Init" << endl;
+		initgl();
+	}
+protected:
+	virtual void initres() {
+		cout << "initres" << endl;
+	}
+private:
+	void initgl() {
+		cout << "initgl" << endl;
+		initres();
+	}
+};
+
+class b : public a {
+	void initres() override {
+		cout << "binitres" << endl;
+	}
+};
+int main() {
+	b ins;
+	ins.Init();
+	return 0;
+}
+```
+
+输出：
+
+init
+
+initgl
+
+binitres
+
+事实一：只要这个函数是定义在基类下的，那么这个函数即使被继承了它的作用域还是基类。
+
+事实二：虚函数无视作用域限定符，只要同名函数，基类的虚函数就会被覆盖（其实也很好理解，因为派生类覆写后的虚函数作用域可能改变）
+
+事实三：一个派生类对象调用的所有虚函数，都是被自己的虚函数覆盖过的。（如果不加基类作用域限定）无论这个函数调用是发生在基类的函数中还是自己的。
+
+（PS：C++怎么越学越难...）
 

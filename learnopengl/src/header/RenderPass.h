@@ -12,12 +12,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
-class GLRenderCore;
+class PassRenderer;
 
 class RenderPass
 {
 public:
-	RenderPass(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
+	RenderPass(PassRenderer& renderCoreIn, std::string shaderName, std::string VBOName);
 	
 	virtual void init() = 0;
 	void use();
@@ -29,7 +29,7 @@ public:
 	void setViewMatrix(glm::mat4 view);
 	void setProjectionMatrix(glm::mat4 projection);
 private:
-	GLRenderCore& renderCore;
+	PassRenderer& renderCore;
 protected:
 	virtual void initVAO() = 0;
 	virtual void initShader() = 0;

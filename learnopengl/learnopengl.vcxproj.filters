@@ -54,10 +54,19 @@
     <ClCompile Include="src\cpp\RPLight.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\cpp\RPPointLight.cpp">
+    <ClCompile Include="src\cpp\lightStruct.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\cpp\lightStruct.cpp">
+    <ClCompile Include="src\cpp\Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\Mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\ModelRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\PassRenderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,8 +95,28 @@
     <ClInclude Include="src\header\lightStruct.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\header\RPPointLight.h">
+    <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ModelRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\PassRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="learnopengl.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

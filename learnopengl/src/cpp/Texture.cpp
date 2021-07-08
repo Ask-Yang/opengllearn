@@ -2,7 +2,7 @@
 
 unsigned int Texture2D::gl_texture_macro_index = GL_TEXTURE0;
 
-Texture2D::Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
+Texture2D::Texture2D(std::string texturePath)
 {
 	current_gl_texture_macro = gl_texture_macro_index++;
 	stbi_set_flip_vertically_on_load(true);
@@ -12,7 +12,14 @@ Texture2D::Texture2D(std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO
 		std::cout << "Failed to load texture" << std::endl;
 		return;
 	}
-	bindGLTexture(GL_COLOR_FORMAT_MACRO);
+	unsigned int format;
+	if (nrChannels == 1)
+		format = GL_RED;
+	else if (nrChannels == 3)
+		format = GL_RGB;
+	else if (nrChannels == 4)
+		format = GL_RGBA;
+	bindGLTexture(format);
 	setTextureWrapMode(textureWrapMode);
 	setTextureFilterMode(textureFilterMode);
 	stbi_image_free(data);

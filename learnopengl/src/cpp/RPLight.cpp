@@ -5,7 +5,7 @@ extern unsigned int verticesSize;
 
 
 
-RPLight::RPLight(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+RPLight::RPLight(PassRenderer& renderCoreIn, std::string shaderName, std::string VBOName)
 	:RenderPass(renderCoreIn, shaderName, VBOName)
 {
 	init();

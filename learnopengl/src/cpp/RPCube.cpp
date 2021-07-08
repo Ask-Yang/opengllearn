@@ -5,7 +5,7 @@ extern float vertices[];
 extern unsigned int verticesSize;
 extern glm::vec3 pointLightPositions[];
 
-RPCube::RPCube(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+RPCube::RPCube(PassRenderer& renderCoreIn, std::string shaderName, std::string VBOName)
 	:RenderPass(renderCoreIn, shaderName, VBOName)
 {
 	init();

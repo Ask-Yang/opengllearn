@@ -3,12 +3,7 @@
 using namespace std;
 using namespace glm;
 
-extern float vertices[];
-extern unsigned int verticesSize;
-extern unsigned int indices[];
-extern unsigned int indicesSize;
-extern vec3 cubePositions[];
-extern vec3 pointLightPositions[];
+
 
 static Camera camera(vec3(4, 0, 4), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
 // 可能的实现：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
@@ -44,6 +39,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 GLRenderCore::GLRenderCore()
 {
 	sg_FirstMouse = true;
+	pCamera = &camera;
 }
 
 GLRenderCore::~GLRenderCore()
@@ -58,44 +54,9 @@ void GLRenderCore::Init()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))  // 必须要先创建窗口才能调用glad
 		cout << "Failed to initialize GLAD" << endl;
 	initResource();
-	initScence();
+	initScene();
 }
 
-void GLRenderCore::Run()
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		processInput(window);
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		currentFrameObjectUpdate();
-		//for (auto& renderPass : coreRenderPassArr)
-		//	renderPass.second->use();
-		for (int i = 0; i < 10; i++)
-		{
-			mat4 model(1.0f);
-			model = translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = rotate(model, radians(angle), vec3(1.0f, 0.3f, 0.5f));
-			mat4 normalTransformMatrix = transpose(inverse(model));
-			coreRenderPassArr["CubePass"]->getPassShader().setMat4("normal", normalTransformMatrix);
-			coreRenderPassArr["CubePass"]->getPassShader().setMat4("model", model);
-			coreRenderPassArr["CubePass"]->use();
-		}
-		for (int i = 0; i < 4; i++)
-		{
-			mat4 model(1.0f);
-			model = translate(model, pointLightPositions[i]);
-			model = scale(model, vec3(0.2f));
-			coreRenderPassArr["LightPass"]->getPassShader().setMat4("model", model);
-			coreRenderPassArr["LightPass"]->use();
-		}
-		
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
 
 std::string GLRenderCore::addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath)
 {
@@ -103,34 +64,23 @@ std::string GLRenderCore::addShaderProgram(std::string shaderName, std::string v
 	return shaderName;
 }
 
-string GLRenderCore::addTexture(string textureName, std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
+void GLRenderCore::frameUpdateViewProjectionMatrix()
 {
-	coreTexture2dArr[textureName] = make_shared<Texture2D>(texturePath, GL_COLOR_FORMAT_MACRO);
-	return textureName;
+	mat4 view = pCamera->getViewMatrix();
+	mat4 projection = perspective(radians(pCamera->getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
+	for (auto& pShader : coreShaderArr)
+	{
+		pShader.second->setMat4("view", view);
+		pShader.second->setMat4("projection", projection);
+	}
+		
 }
-
-std::string GLRenderCore::addVBO(std::string VBOName, float* vertices, unsigned int verticesSize)
-{
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
-	coreVBOArr[VBOName] = VBO;
-	return VBOName;
-}
-
 
 
 void GLRenderCore::enableDepthTest()
 {
-		glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 }
-
-void GLRenderCore::enableTexture(std::string textureName)
-{
-	coreTexture2dArr[textureName]->use();
-}
-
 void GLRenderCore::processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -172,65 +122,6 @@ void GLRenderCore::initWindow()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-}
-
-void GLRenderCore::initScence()
-{
-	shared_ptr<RenderPass> lightPassPtr = make_shared<RPLight>(*this, "LightShader", "CubeVBO");
-	shared_ptr<RenderPass> cubePassPtr = make_shared<RPCube>(*this, "CubeShader", "CubeVBO");
-	cubePassPtr->addPassTexture("objectDiffuse");
-	cubePassPtr->addPassTexture("objectSpecular");
-
-	coreRenderPassArr["LightPass"] = lightPassPtr;
-	coreRenderPassArr["CubePass"] = cubePassPtr;
-}
-
-void GLRenderCore::initResource()
-{
-	initVBO();
-	initShader();
-	initTexture();
-}
-
-void GLRenderCore::initVBO()
-{
-	addVBO("CubeVBO", vertices, verticesSize);
-}
-
-void GLRenderCore::initTexture()
-{
-	addTexture("objectDiffuse", "./resources/textures/container2.png", GL_RGBA);
-	addTexture("objectSpecular", "./resources/textures/container2_specular.png", GL_RGBA);
-}
-
-void GLRenderCore::initShader()
-{
-	addShaderProgram("CubeShader", "./src/GLSL/vShader.vert", "./src/GLSL/fShader.frag");
-	addShaderProgram("LightShader", "./src/GLSL/vShader.vert", "./src/GLSL/light.frag");
-}
-
-void GLRenderCore::updateMVPMatrix()
-{
-	mat4 view = camera.getViewMatrix();
-	mat4 projection = perspective(radians(camera.getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
-	for (auto& renderPass : coreRenderPassArr)
-	{
-		renderPass.second->setViewMatrix(view);
-		renderPass.second->setProjectionMatrix(projection);
-	}
-}
-
-void GLRenderCore::currentFrameObjectUpdate()
-{
-	updateMVPMatrix();
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("viewPos", camera.getCameraPosition());
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.position", camera.getCameraPosition());
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.direction", camera.getCameraFront());
-	//glm::vec3 lightColor;
-	//lightColor.x = sin(glfwGetTime() * 2.0f);
-	//lightColor.y = sin(glfwGetTime() * 0.7f);
-	//lightColor.z = sin(glfwGetTime() * 1.3f);
-	//coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
 }
 
 

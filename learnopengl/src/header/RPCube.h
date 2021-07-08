@@ -5,7 +5,7 @@ class RPCube :
     public RenderPass
 {
 public:
-    RPCube(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName);
+    RPCube(PassRenderer& renderCoreIn, std::string shaderName, std::string VBOName);
     void init() override;
 private:
     void initVAO() override;

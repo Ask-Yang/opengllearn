@@ -1,9 +1,9 @@
 #include "RenderPass.h"
-#include "GLRenderCore.h"
+#include "PassRenderer.h"
 using namespace std;
 
 
-RenderPass::RenderPass(GLRenderCore& renderCoreIn, std::string shaderName, std::string VBOName)
+RenderPass::RenderPass(PassRenderer& renderCoreIn, std::string shaderName, std::string VBOName)
 	:renderCore(renderCoreIn),
 	passShader(*(renderCoreIn.getShaderProgram(shaderName)))
 {
