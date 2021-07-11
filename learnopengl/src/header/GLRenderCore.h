@@ -30,7 +30,6 @@ public:
 protected:
 	virtual void initScene() = 0;
 	virtual void initResource() = 0;
-	virtual void initShader() = 0;
 	void processInput(GLFWwindow* window);
 
 	std::string addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath);

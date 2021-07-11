@@ -4,7 +4,7 @@
 #include "ModelRenderer.h"
 int main()
 {
-	ModelRenderer glrcore;
+	PassRenderer glrcore;
 	glrcore.Init();
 	glrcore.enableDepthTest();
 	glrcore.Run();

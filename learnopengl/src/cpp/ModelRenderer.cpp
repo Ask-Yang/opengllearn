@@ -20,9 +20,8 @@ void ModelRenderer::Run()
 
 void ModelRenderer::initResource()
 {
-	initShader();
+	addShaderProgram("modelShader", "./src/GLSL/model.vert", "./src/GLSL/model.frag");
 	model = make_shared<Model>("./resources/objects/backpack/backpack.obj");
-
 }
 
 void ModelRenderer::initScene()
@@ -33,10 +32,6 @@ void ModelRenderer::initScene()
 	coreShaderArr["modelShader"]->setMat4("model", model);
 }
 
-void ModelRenderer::initShader()
-{
-	addShaderProgram("modelShader", "./src/GLSL/model.vert", "./src/GLSL/model.frag");
-}
 
 void ModelRenderer::currentFrameObjectUpdate()
 {

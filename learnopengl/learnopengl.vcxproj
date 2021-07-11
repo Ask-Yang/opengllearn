@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\RPAdvance.cpp" />
+    <ClCompile Include="src\cpp\AdvanceRenderer.cpp" />
     <ClCompile Include="src\cpp\PassRenderer.cpp" />
     <ClCompile Include="src\cpp\ModelRenderer.cpp" />
     <ClCompile Include="src\cpp\lightStruct.cpp" />
@@ -39,6 +41,8 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\RPAdvance.h" />
+    <ClInclude Include="src\header\AdvanceRenderer.h" />
     <ClInclude Include="src\header\PassRenderer.h" />
     <ClInclude Include="src\header\ModelRenderer.h" />
     <ClInclude Include="resource.h" />

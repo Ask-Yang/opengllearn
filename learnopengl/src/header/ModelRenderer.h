@@ -8,7 +8,6 @@ public:
 private:
     void initResource() override;
     void initScene() override;
-    void initShader() override;
 
     void currentFrameObjectUpdate();
     std::shared_ptr<Model> model;

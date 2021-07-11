@@ -7,6 +7,7 @@ using namespace glm;
 
 static Camera camera(vec3(4, 0, 4), vec3(0, 0, 0), vec3(0, 1, 0)); // 那如果有多个窗口如何实现呢？
 // 可能的实现：每个类保存自己的这个对应的变量，然后要用的时候就取这个全局变量的值，进行计算，看情况进行覆写
+// 每个类有自己的camera才行
 static bool sg_FirstMouse = true;
 static float sg_lastFrameTime = 0.0f;
 static float sg_lastMouseX = 0.0f;
@@ -76,11 +77,11 @@ void GLRenderCore::frameUpdateViewProjectionMatrix()
 		
 }
 
-
 void GLRenderCore::enableDepthTest()
 {
 	glEnable(GL_DEPTH_TEST);
 }
+
 void GLRenderCore::processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

@@ -22,31 +22,12 @@ void PassRenderer::initScene()
 
 void PassRenderer::initResource()
 {
-	initVBO();
-	initShader();
-	initTexture();
-}
-
-void PassRenderer::initShader()
-{
 	addShaderProgram("CubeShader", "./src/GLSL/cube.vert", "./src/GLSL/cube.frag");
 	addShaderProgram("LightShader", "./src/GLSL/cube.vert", "./src/GLSL/light.frag");
-}
-
-
-void PassRenderer::initVBO()
-{
 	addVBO("CubeVBO", vertices, verticesSize);
+	addTexture("objectDiffuse", "./resources/textures/container2.png");
+	addTexture("objectSpecular", "./resources/textures/container2_specular.png");
 }
-
-void PassRenderer::initTexture()
-{
-	addTexture("objectDiffuse", "./resources/textures/container2.png", GL_RGBA);
-	addTexture("objectSpecular", "./resources/textures/container2_specular.png", GL_RGBA);
-}
-
-
-
 
 void PassRenderer::currentFrameObjectUpdate()
 {
@@ -61,7 +42,7 @@ void PassRenderer::currentFrameObjectUpdate()
 	//coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
 }
 
-string PassRenderer::addTexture(string textureName, std::string texturePath, unsigned int GL_COLOR_FORMAT_MACRO)
+string PassRenderer::addTexture(string textureName, std::string texturePath)
 {
 	coreTexture2dArr[textureName] = make_shared<Texture2D>(texturePath);
 	return textureName;
