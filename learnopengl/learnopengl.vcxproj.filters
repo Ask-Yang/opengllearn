@@ -75,6 +75,9 @@
     <ClCompile Include="src\cpp\RPAdvance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\GLBindCostTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\GLRenderCore.h">

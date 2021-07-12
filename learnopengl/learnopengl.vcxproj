@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\GLBindCostTest.cpp" />
     <ClCompile Include="src\cpp\RPAdvance.cpp" />
     <ClCompile Include="src\cpp\AdvanceRenderer.cpp" />
     <ClCompile Include="src\cpp\PassRenderer.cpp" />

@@ -23,6 +23,7 @@ Texture2D::Texture2D(std::string texturePath)
 	setTextureWrapMode(textureWrapMode);
 	setTextureFilterMode(textureFilterMode);
 	stbi_image_free(data);
+	
 }
 
 void Texture2D::use()

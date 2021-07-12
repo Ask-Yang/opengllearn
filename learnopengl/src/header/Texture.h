@@ -24,6 +24,7 @@ public:
 	void use(int GL_TEXTURE_MACRO);
 	void setTextureWrapMode(WrapMode wm);
 	void setTextureFilterMode(FilterMode fm);
+
 	unsigned int getTextureSlot() {
 		return current_gl_texture_macro - GL_TEXTURE0;
 	}
