@@ -20,10 +20,7 @@ protected:
 	virtual void initResource() override;
 
 	std::string addTexture(std::string textureName, std::string texturePath);
-
 	std::string addVBO(std::string VBOName, float* vertices, unsigned int verticesSize);
-	void currentFrameObjectUpdate();
-
 
 protected:
 	std::map<std::string, unsigned int> coreVBOArr;

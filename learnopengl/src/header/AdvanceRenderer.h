@@ -1,5 +1,6 @@
 #pragma once
 #include "PassRenderer.h"
+#include "RPAdvance.h"
 class AdvanceRenderer :
     public PassRenderer
 {

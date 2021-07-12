@@ -29,19 +29,6 @@ void PassRenderer::initResource()
 	addTexture("objectSpecular", "./resources/textures/container2_specular.png");
 }
 
-void PassRenderer::currentFrameObjectUpdate()
-{
-	frameUpdateViewProjectionMatrix();
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("viewPos", pCamera->getCameraPosition());
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.position", pCamera->getCameraPosition());
-	coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.direction", pCamera->getCameraFront());
-	//glm::vec3 lightColor;
-	//lightColor.x = sin(glfwGetTime() * 2.0f);
-	//lightColor.y = sin(glfwGetTime() * 0.7f);
-	//lightColor.z = sin(glfwGetTime() * 1.3f);
-	//coreRenderPassArr[1]->getShader()->setVec3("lightColor", lightColor);
-}
-
 string PassRenderer::addTexture(string textureName, std::string texturePath)
 {
 	coreTexture2dArr[textureName] = make_shared<Texture2D>(texturePath);
@@ -66,9 +53,10 @@ void PassRenderer::Run()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		currentFrameObjectUpdate();
-		//for (auto& renderPass : coreRenderPassArr)
-		//	renderPass.second->use();
+		frameUpdateViewProjectionMatrix();
+		coreRenderPassArr["CubePass"]->getPassShader().setVec3("viewPos", pCamera->getCameraPosition());
+		coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.position", pCamera->getCameraPosition());
+		coreRenderPassArr["CubePass"]->getPassShader().setVec3("spotLight.direction", pCamera->getCameraFront());
 		for (int i = 0; i < 10; i++)
 		{
 			mat4 model(1.0f);
