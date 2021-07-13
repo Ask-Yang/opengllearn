@@ -13,7 +13,11 @@ float LinearizeDepth(float depth)
     return (2.0 * near * far) / (far + near - z * (far - near)); 
 }
 
+uniform samplerCube skybox;
+
+
 void main()
 {    
+    
     FragColor = texture(texture1, TexCoords);
 }

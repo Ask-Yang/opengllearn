@@ -29,6 +29,14 @@ void PassRenderer::initResource()
 	addTexture("objectSpecular", "./resources/textures/container2_specular.png");
 }
 
+void PassRenderer::initVAO()
+{
+}
+
+void PassRenderer::initShaderContent()
+{
+}
+
 string PassRenderer::addTexture(string textureName, std::string texturePath)
 {
 	coreTexture2dArr[textureName] = make_shared<Texture2D>(texturePath);

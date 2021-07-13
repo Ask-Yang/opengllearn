@@ -18,6 +18,8 @@ public:
 protected:
 	virtual void initScene() override;
 	virtual void initResource() override;
+	virtual void initVAO();
+	virtual void initShaderContent();
 
 	std::string addTexture(std::string textureName, std::string texturePath);
 	std::string addVBO(std::string VBOName, float* vertices, unsigned int verticesSize);
