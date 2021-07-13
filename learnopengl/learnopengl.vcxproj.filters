@@ -78,6 +78,9 @@
     <ClCompile Include="src\cpp\GLBindCostTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\RPPostProcess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\GLRenderCore.h">
@@ -123,6 +126,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\header\RPAdvance.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\RPPostProcess.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

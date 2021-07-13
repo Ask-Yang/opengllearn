@@ -7,6 +7,8 @@ extern float planeVertices[];
 extern unsigned int planeVerticesSize;
 extern float transparentVertices[];
 extern unsigned int transparentVerticesSize;
+extern float quadVertices[];
+extern unsigned int quadVerticesSize;
 
 using namespace std;
 vector<glm::vec3> windowPos;
@@ -24,7 +26,7 @@ void AdvanceRenderer::Run()
 	//	glfwPollEvents();
 	//}
 
-	TransparencyRun();
+	FrameBufferRun();
 }
 
 void AdvanceRenderer::initResource()
@@ -32,15 +34,19 @@ void AdvanceRenderer::initResource()
 	addVBO("CubeVBO", cubeVertices, cubeVerticesSize);
 	addVBO("PlaneVBO", planeVertices, planeVerticesSize);
 	addShaderProgram("AdvanceShader", "./src/GLSL/advance.vert", "./src/GLSL/advance.frag");
-	addTexture("Marble", "./resources/textures/marble.jpg");
+	addTexture("Marble", "./resources/textures/container.jpg");
 	addTexture("Metal", "./resources/textures/metal.png");
 
 	// stencil
 	addShaderProgram("ColorShader", "./src/GLSL/advance.vert", "./src/GLSL/outline.frag");
-	//blend
+	// blend
 	addVBO("RectangleVBO", transparentVertices, transparentVerticesSize);
 	addShaderProgram("BlendShader", "./src/GLSL/advance.vert", "./src/GLSL/transparent.frag");
 	addTexture("Grass", "./resources/textures/window.png");
+	// frame buffer
+	addVBO("QuadVBO", quadVertices, quadVerticesSize);
+	addShaderProgram("PostProcessShader", "./src/GLSL/postprocess.vert", "./src/GLSL/postprocess.frag");
+	customizeFrameBuffer();
 }
 
 void AdvanceRenderer::initScene()
@@ -68,9 +74,58 @@ void AdvanceRenderer::initScene()
 	windowPos.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
 	windowPos.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
 	windowPos.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
-
+	// frame buffer(postprocess)
+	shared_ptr<RenderPass> pPostProcessPass = make_shared<RPPostProcess>(*this, "PostProcessShader", "QuadVBO");
+	coreRenderPassArr["pPostProcessPass"] = pPostProcessPass;
 }
 
+void AdvanceRenderer::customizeFrameBuffer()
+{
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	glGenTextures(1, &texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // ½â°óÖ¡»º³å£¬·ÀÖ¹³ÌÐòÆäËüµØ·½´íÎóµØäÖÈ¾Õâ¸öÖ¡»º³å
+}
+
+void AdvanceRenderer::drawScene()
+{
+	coreRenderPassArr["pAdvancePlanePass"]->getPassShader().setTexture("texture1", 1);
+	coreRenderPassArr["pAdvancePlanePass"]->use();
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glm::mat4 model(1.0f);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f));
+	coreRenderPassArr["pAdvanceCubePass"]->getPassShader().setTexture("texture1", 0);
+	coreRenderPassArr["pAdvanceCubePass"]->setModelMatrix(model);
+	coreRenderPassArr["pAdvanceCubePass"]->use();
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+	coreRenderPassArr["pAdvanceCubePass"]->setModelMatrix(model);
+	coreRenderPassArr["pAdvanceCubePass"]->use();
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
 
 void AdvanceRenderer::StencilRun()
 {
@@ -141,22 +196,8 @@ void AdvanceRenderer::TransparencyRun()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		frameUpdateViewProjectionMatrix();
+		drawScene();
 
-		coreRenderPassArr["pAdvancePlanePass"]->getPassShader().setTexture("texture1", 1);
-		coreRenderPassArr["pAdvancePlanePass"]->use();
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		glm::mat4 model(1.0f);
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f));
-		coreRenderPassArr["pAdvanceCubePass"]->getPassShader().setTexture("texture1", 0);
-		coreRenderPassArr["pAdvanceCubePass"]->setModelMatrix(model);
-		coreRenderPassArr["pAdvanceCubePass"]->use();
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
-		coreRenderPassArr["pAdvanceCubePass"]->setModelMatrix(model);
-		coreRenderPassArr["pAdvanceCubePass"]->use();
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC1_ALPHA);
 		for (auto p = sorted.rbegin();p!=sorted.rend();p++)
@@ -168,6 +209,31 @@ void AdvanceRenderer::TransparencyRun()
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 		glDisable(GL_BLEND);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+}
+
+void AdvanceRenderer::FrameBufferRun()
+{
+	while (!glfwWindowShouldClose(window))
+	{
+		processInput(window);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		frameUpdateViewProjectionMatrix();
+		drawScene();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+		coreRenderPassArr["pPostProcessPass"]->use();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\RPPostProcess.cpp" />
     <ClCompile Include="src\cpp\GLBindCostTest.cpp" />
     <ClCompile Include="src\cpp\RPAdvance.cpp" />
     <ClCompile Include="src\cpp\AdvanceRenderer.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\RPPostProcess.h" />
     <ClInclude Include="src\header\RPAdvance.h" />
     <ClInclude Include="src\header\AdvanceRenderer.h" />
     <ClInclude Include="src\header\PassRenderer.h" />
