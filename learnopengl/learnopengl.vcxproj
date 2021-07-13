@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\GLRenderCore.cpp" />
+    <ClCompile Include="src\cpp\RPSkybox.cpp" />
     <ClCompile Include="src\cpp\RPPostProcess.cpp" />
     <ClCompile Include="src\cpp\GLBindCostTest.cpp" />
     <ClCompile Include="src\cpp\RPAdvance.cpp" />
@@ -33,16 +35,15 @@
     <ClCompile Include="src\cpp\RenderPass.cpp" />
     <ClCompile Include="src\cpp\Camera.cpp" />
     <ClCompile Include="src\cpp\glad.c" />
-    <ClCompile Include="src\cpp\GLRenderCore.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
     <ClCompile Include="src\cpp\modelData.cpp" />
-    <ClCompile Include="src\cpp\officialImplementaion.cpp" />
     <ClCompile Include="src\cpp\Shader.cpp" />
     <ClCompile Include="src\cpp\stb_image_active.cpp" />
     <ClCompile Include="src\cpp\test.cpp" />
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\RPSkybox.h" />
     <ClInclude Include="src\header\RPPostProcess.h" />
     <ClInclude Include="src\header\RPAdvance.h" />
     <ClInclude Include="src\header\AdvanceRenderer.h" />

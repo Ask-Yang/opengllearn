@@ -7,7 +7,6 @@ int main()
 {
 	AdvanceRenderer glrcore;
 	glrcore.Init();
-	glrcore.enableDepthTest();
 	glrcore.Run();
     return 0;
 }

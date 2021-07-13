@@ -9,8 +9,11 @@ extern float transparentVertices[];
 extern unsigned int transparentVerticesSize;
 extern float quadVertices[];
 extern unsigned int quadVerticesSize;
+extern float skyboxVertices[];
+extern unsigned int skyboxVerticesSize;
 
 using namespace std;
+using namespace glm;
 vector<glm::vec3> windowPos;
 
 void AdvanceRenderer::Run()
@@ -26,7 +29,7 @@ void AdvanceRenderer::Run()
 	//	glfwPollEvents();
 	//}
 
-	FrameBufferRun();
+	SkyboxRun();
 }
 
 void AdvanceRenderer::initResource()
@@ -47,13 +50,17 @@ void AdvanceRenderer::initResource()
 	addVBO("QuadVBO", quadVertices, quadVerticesSize);
 	addShaderProgram("PostProcessShader", "./src/GLSL/postprocess.vert", "./src/GLSL/postprocess.frag");
 	customizeFrameBuffer();
+	// cubemap(skybox)
+	loadCubemap();
+	addVBO("SkyboxVBO", skyboxVertices, skyboxVerticesSize);
+	addShaderProgram("SkyboxShader", "./src/GLSL/skybox.vert", "./src/GLSL/skybox.frag");
 }
 
 void AdvanceRenderer::initScene()
 {
 	coreTexture2dArr["Marble"]->setTextureWrapMode(Texture2D::WrapMode::Repeat);
 	coreTexture2dArr["Metal"]->setTextureWrapMode(Texture2D::WrapMode::Repeat);
-	coreTexture2dArr["Grass"]->setTextureWrapMode(Texture2D::WrapMode::Clamp);
+
 	shared_ptr<RenderPass> pAdvanceCubePass = make_shared<RPAdvance>(*this, "AdvanceShader", "CubeVBO");
 	shared_ptr<RenderPass> pAdvancePlanePass = make_shared<RPAdvance>(*this, "AdvanceShader", "PlaneVBO");
 	pAdvanceCubePass->addPassTexture("Marble");
@@ -65,6 +72,7 @@ void AdvanceRenderer::initScene()
 	shared_ptr<RenderPass> pColorPass = make_shared<RPAdvance>(*this, "ColorShader", "CubeVBO");
 	coreRenderPassArr["pColorPass"] = pColorPass;
 	// blend
+	coreTexture2dArr["Grass"]->setTextureWrapMode(Texture2D::WrapMode::Clamp);
 	shared_ptr<RenderPass> pBlendPass = make_shared<RPAdvance>(*this, "BlendShader", "RectangleVBO");
 	coreRenderPassArr["pBlendPass"] = pBlendPass;
 	pBlendPass->addPassTexture("Grass");
@@ -77,6 +85,44 @@ void AdvanceRenderer::initScene()
 	// frame buffer(postprocess)
 	shared_ptr<RenderPass> pPostProcessPass = make_shared<RPPostProcess>(*this, "PostProcessShader", "QuadVBO");
 	coreRenderPassArr["pPostProcessPass"] = pPostProcessPass;
+	// cubemap(skybox) 
+	shared_ptr<RenderPass> pSkyboxPass = make_shared<RPSkybox>(*this, "SkyboxShader", "SkyboxVBO");
+	coreRenderPassArr["pSkyboxPass"] = pSkyboxPass;
+}
+
+void AdvanceRenderer::loadCubemap()
+{
+	vector<string> faces{
+		"./resources/textures/skybox/right.jpg",
+		"./resources/textures/skybox/left.jpg",
+		"./resources/textures/skybox/top.jpg",
+		"./resources/textures/skybox/bottom.jpg",
+		"./resources/textures/skybox/front.jpg",
+		"./resources/textures/skybox/back.jpg"
+	};
+	glGenTextures(1, &cubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 void AdvanceRenderer::customizeFrameBuffer()
@@ -238,4 +284,34 @@ void AdvanceRenderer::FrameBufferRun()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+}
+
+void AdvanceRenderer::SkyboxRun()
+{
+	while (!glfwWindowShouldClose(window))
+	{
+		processInput(window);
+
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+
+		frameUpdateViewProjectionMatrix();
+		mat4 skyboxView = mat4(mat3x3(pCamera->getViewMatrix()));
+		coreShaderArr["SkyboxShader"]->setMat4("view", skyboxView);
+		
+		drawScene();
+
+		glDepthFunc(GL_LEQUAL);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+		coreRenderPassArr["pSkyboxPass"]->use();
+		glDepthFunc(GL_LESS);
+
+
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
 }

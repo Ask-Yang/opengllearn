@@ -18,9 +18,6 @@
     <ClCompile Include="src\cpp\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\cpp\GLRenderCore.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\cpp\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -37,9 +34,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\cpp\stb_image_active.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\cpp\officialImplementaion.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\cpp\Camera.cpp">
@@ -79,6 +73,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\cpp\RPPostProcess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\RPSkybox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cpp\GLRenderCore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -129,6 +129,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\header\RPPostProcess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\RPSkybox.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

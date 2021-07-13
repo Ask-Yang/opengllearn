@@ -40,7 +40,7 @@ private:
 	glm::vec3 m_cameraRight;
 	float m_pitch = 0.0f;
 	float m_yaw = -135.0f;
-	float m_cameraMoveSpeed = 1.0f;
+	float m_cameraMoveSpeed = 3.0f;
 	float m_cameraPitchSensitivity = 0.1f;
 	float m_cameraYawSensitivity = 0.1f;
 private:
