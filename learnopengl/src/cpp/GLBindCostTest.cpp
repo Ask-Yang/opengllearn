@@ -70,7 +70,43 @@ void testGLUseProgram()
 	// 0.0001929
 }
 
-int main10()
+void testGLUniformBuffer()
+{
+	unsigned int uniformBuffer1;
+	unsigned int uniformBuffer2;
+	unsigned int uniformBuffer3;
+	glGenBuffers(1, &uniformBuffer1);
+	glGenBuffers(1, &uniformBuffer2);
+	glGenBuffers(1, &uniformBuffer3);
+	double start = glfwGetTime();
+	for (int i = 0; i < runTime; i++)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer1);
+		glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer2);
+		glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer3);
+	}
+	std::cout << glfwGetTime() - start << std::endl;
+}
+
+void testGLFrameBuffer()
+{
+	unsigned int frameBuffer1;
+	unsigned int frameBuffer2;
+	unsigned int frameBuffer3;
+	glGenFramebuffers(1, &frameBuffer1);
+	glGenFramebuffers(1, &frameBuffer2);
+	glGenFramebuffers(1, &frameBuffer3);
+	double start = glfwGetTime();
+	for (int i = 0; i < runTime; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer1);
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer2);
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer3);
+	}
+	std::cout << glfwGetTime() - start << std::endl;
+}
+
+int main()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -101,7 +137,9 @@ int main10()
 	testGLBindBuffer();
 	testGLBindTexture();
 	testGLUseProgram();
-	// texture > buffer = useprogram 而且都不受数据本身大小影响
+	testGLUniformBuffer();
+	testGLFrameBuffer();
+	// texture > vertexArraybuffer = useprogram > uniformBuffer >> framebuffer 而且都不受数据本身大小影响
 	// 差不多是2-1.5倍的时间
 	return 0;
 }

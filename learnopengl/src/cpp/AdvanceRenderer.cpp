@@ -299,7 +299,6 @@ void AdvanceRenderer::SkyboxRun()
 		frameUpdateViewProjectionMatrix();
 		mat4 skyboxView = mat4(mat3x3(pCamera->getViewMatrix()));
 		coreShaderArr["SkyboxShader"]->setMat4("view", skyboxView);
-		coreShaderArr["AdvanceShader"]->setTexture("skybox", 0);
 
 		drawScene();
 
