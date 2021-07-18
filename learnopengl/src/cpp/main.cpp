@@ -3,7 +3,7 @@
 #include "PassRenderer.h"
 #include "ModelRenderer.h"
 #include "AdvanceRenderer.h"
-int main23123()
+int main()
 {
 	AdvanceRenderer glrcore;
 	glrcore.Init();

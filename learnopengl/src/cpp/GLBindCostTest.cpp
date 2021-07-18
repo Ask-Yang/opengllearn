@@ -106,7 +106,7 @@ void testGLFrameBuffer()
 	std::cout << glfwGetTime() - start << std::endl;
 }
 
-int main()
+int main156()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
