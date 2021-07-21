@@ -152,5 +152,119 @@ binitres
 
 事实三：一个派生类对象调用的所有虚函数，都是被自己的虚函数覆盖过的。（如果不加基类作用域限定）无论这个函数调用是发生在基类的函数中还是自己的。
 
-（PS：C++怎么越学越难...）
+**纯虚函数**
 
+纯虚函数如果实现了，还是可以在子类中通过作用域限定符去访问的，如果没实现但去调用了，链接就会报错了。所以因为不知道纯虚函数到底实现没有，尽量还是不要访问。不要实现。
+
+
+
+### 6、hash表和树的取舍（map和unordered_map）
+
+stl里的hash表，有质数个篮子（对素数取余不容易重复，当然如果有很好的hash函数这个大小就没那么重要了），元素如果大于质数，就扩充一倍（rehash）。如果重复，就使用线性表，所以如果数据不多的话，篮子很少，重复可能很多。
+
+所以小数据用map，大数据可以用unordered_map。
+
+另外自定义类型，map需要定义operator<，hash需要定义hash函数和operator==。
+
+### 7、default copy assignment operator 、default constructor、default copy constructor
+
+**Deleted implicitly-declared copy assignment operator**
+
+A implicitly-declared copy assignment operator for class `T` is defined as *deleted* if any of the following is true:
+
+- `T` has a user-declared move constructor;
+- `T` has a user-declared move assignment operator.
+
+Otherwise, it is defined as defaulted.
+
+A defaulted copy assignment operator for class `T` is defined as *deleted* if any of the following is true:
+
+- `T` has a non-static data member of non-class type (or array thereof) that is const;
+- `T` has a non-static data member of a reference type;
+- `T` has a non-static data member or a direct or virtual base class that cannot be copy-assigned (overload resolution for the copy assignment fails, or selects a deleted or inaccessible function);
+- `T` is a [union-like class](https://en.cppreference.com/w/cpp/language/union#Union-like_classes), and has a variant member whose corresponding assignment operator is non-trivial.
+
+
+
+**Deleted implicitly-declared default constructor**
+
+The implicitly-declared or defaulted (since C++11) default constructor for class `T` is undefined (until C++11)defined as deleted (since C++11) if any of the following is true:
+
+- `T` has a member of reference type without a default initializer. (since C++11)
+
+- `T` has a non-[const-default-constructible](https://en.cppreference.com/w/cpp/language/default_initialization#Default_initialization_of_a_const_object) const member without a default member initializer (since C++11).
+
+- `T` **has a member (without a default member initializer) (since C++11) which has a deleted default constructor**, or its default constructor is ambiguous or inaccessible from this constructor.
+
+- `T` has a direct or virtual base which has a deleted default constructor, or it is ambiguous or inaccessible from this constructor.
+
+- `T` has a direct or virtual base which has a deleted destructor, or a destructor that is inaccessible from this constructor.
+
+  `T` is a union with at least one variant member with non-trivial default constructor, and no variant member of `T` has a default member initializer.`T` is a non-union class with a variant member `M` with a non-trivial default constructor, and no variant member of the anonymous union containing `M` has a default member initializer.  (since C++11)
+
+- `T` is a union and all of its variant members are const.
+
+  If no user-defined constructors are present and the implicitly-declared default constructor is not trivial, the user may still inhibit the automatic generation of an implicitly-defined default constructor by the compiler with the keyword `delete`.
+
+简单来说就是如果引用成员就无法进行隐式赋值，如果成员有的没有默认构造那么就无法构建默认构造。但是有的成员没有默认构造但是赋值操作还是可以进行，讲实话这个设置还是有一些迷惑的。
+
+
+
+**Deleted implicitly-declared copy constructor**
+
+- `T` has non-static data members that cannot be copied (have deleted, inaccessible, or ambiguous copy constructors);
+- `T` has direct or virtual base class that cannot be copied (has deleted, inaccessible, or ambiguous copy constructors);
+- `T` has direct or virtual base class with a deleted or inaccessible destructor;
+
+* `T` is a union-like class and has a variant member with non-trivial copy constructor;
+* `T` has a data member of **rvalue reference type**;
+* `T` has a user-defined [move constructor](https://en.cppreference.com/w/cpp/language/move_constructor) or [move assignment operator](https://en.cppreference.com/w/cpp/language/move_assignment) (this condition only causes the implicitly-declared, not the defaulted, copy constructor to be deleted).
+
+
+
+**When to overload them？**
+
+一般是成员中有引用或者指针（动态分配了内存）的时候。而且这里有个0/3/5原则，就是要重载就把destructor, copy constructor, copy assignment operator(move ctor, move assignment )一起重载了。
+
+如果成员用的是智能指针也可以不用改，智能指针会自己帮你管理内存，所以不需要覆写这个deconstructor，所以就万事大吉。
+
+**move constructor**
+
+move constructor一般是在传参有临时变量的时候用到，这个时候就会将临时变量的内存直接给到新的变量上，然后临时变量的内存就变为空（临时变量的内存被“偷”了）。如果是生命期还存在的变量那么就会直接调用复制构造。
+
+另外在函数传非引用传参进去一个临时变量时，编译器可能会优化，然后不调用复制构造，直接用这个临时变量当参数。
+
+
+
+### 8、copy constructor and assignment  operator
+
+A **copy constructor** is used to initialize a **previously uninitialized** object from some other object's data.
+
+```cpp
+A(const A& rhs) : data_(rhs.data_) {}
+```
+
+For example:
+
+```cpp
+A aa;
+A a = aa;  //copy constructor
+```
+
+An **assignment operator** is used to replace the data of a **previously initialized** object with some other object's data.
+
+```cpp
+A& operator=(const A& rhs) {data_ = rhs.data_; return *this;}
+```
+
+For example:
+
+```cpp
+A aa;
+A a;
+a = aa;  // assignment operator
+```
+
+You could replace copy construction by default construction plus assignment, but that would be less efficient.
+
+(As a side note: My implementations above are exactly the ones the compiler grants you for free, so it would not make much sense to implement them manually. If you have one of these two, it's likely that you are manually managing some resource. In that case, per *[The Rule of Three](https://stackoverflow.com/questions/4172722/what-is-the-rule-of-three)*, you'll very likely also need the other one plus a destructor.)
