@@ -268,3 +268,18 @@ a = aa;  // assignment operator
 You could replace copy construction by default construction plus assignment, but that would be less efficient.
 
 (As a side note: My implementations above are exactly the ones the compiler grants you for free, so it would not make much sense to implement them manually. If you have one of these two, it's likely that you are manually managing some resource. In that case, per *[The Rule of Three](https://stackoverflow.com/questions/4172722/what-is-the-rule-of-three)*, you'll very likely also need the other one plus a destructor.)
+
+
+
+### 9、unique_ptr, shared_ptr, weak_ptr
+
+unique_ptr只能绑定一个对象，使用private使得复制构造和赋值构造无法被访问。
+
+shared_ptr使用引用计算来管理内存，但是有以下缺点：
+
+1. 内部变量暴露，使得独立生成的shared_ptr指向同一块内存，或者对于独立分配的对象在局部作用域内转换为shared_ptr。总而言之就是混用一般的指针和智能指针。
+2. 循环引用，那么这个对象永远不会被释放。
+3. 在多线程时，需要保证引用计数增加是线程安全的。
+4. 比普通指针占用更多开销。
+
+另外，如果觉得std::shared_ptr<classname>这样名字太长可以使用typedef。

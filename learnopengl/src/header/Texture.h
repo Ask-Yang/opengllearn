@@ -19,7 +19,8 @@ public:
 public:
 	std::string path;
 	std::string type;
-	Texture2D(std::string texturePath);
+	explicit Texture2D(std::string texturePath);
+	explicit Texture2D(unsigned int _width, unsigned int _height, unsigned int GLTEXTUREFORMAT);
 	void use();
 	void use(int GL_TEXTURE_MACRO);
 	void setTextureWrapMode(WrapMode wm);
@@ -30,6 +31,12 @@ public:
 	}
 	unsigned int getTextureID() {
 		return texture;
+	}
+	int getWidth() {
+		return width;
+	}
+	int getHeight() {
+		return height;
 	}
 private:
 	void bindGLTexture(unsigned int GL_COLOR_FORMAT_MACRO);
