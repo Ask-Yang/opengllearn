@@ -226,7 +226,9 @@ The implicitly-declared or defaulted (since C++11) default constructor for class
 
 一般是成员中有引用或者指针（动态分配了内存）的时候。而且这里有个0/3/5原则，就是要重载就把destructor, copy constructor, copy assignment operator(move ctor, move assignment )一起重载了。
 
-如果成员用的是智能指针也可以不用改，智能指针会自己帮你管理内存，所以不需要覆写这个deconstructor，所以就万事大吉。
+如果成员用的是智能指针也可以不用改，智能指针会自己帮你管理内存，所以不需要覆写这个deconstructor。
+
+需要改的时候就是用指针new了资源，然后需要深拷贝的时候，这个时候就必须自定义。
 
 **move constructor**
 
