@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\ShadowRenderer.cpp" />
     <ClCompile Include="src\cpp\GLRenderCore.cpp" />
     <ClCompile Include="src\cpp\RPSkybox.cpp" />
     <ClCompile Include="src\cpp\RPPostProcess.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\cpp\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\header\ShadowRenderer.h" />
     <ClInclude Include="src\header\RPSkybox.h" />
     <ClInclude Include="src\header\RPPostProcess.h" />
     <ClInclude Include="src\header\RPAdvance.h" />

@@ -3,9 +3,10 @@
 #include "PassRenderer.h"
 #include "ModelRenderer.h"
 #include "AdvanceRenderer.h"
+#include "ShadowRenderer.h"
 int main()
 {
-	AdvanceRenderer glrcore;
+	ShadowRenderer glrcore;
 	glrcore.Init();
 	glrcore.Run();
     return 0;

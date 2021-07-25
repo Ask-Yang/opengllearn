@@ -81,6 +81,9 @@
     <ClCompile Include="src\cpp\GLRenderCore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\ShadowRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\GLRenderCore.h">
@@ -132,6 +135,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\header\RPSkybox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ShadowRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
