@@ -14,7 +14,8 @@ void ShadowRenderer::Run()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-
+		glEnable(GL_DEPTH_TEST);
+		
 		glViewport(0, 0, coreTexture2dArr["DepthMap"]->getWidth(), coreTexture2dArr["DepthMap"]->getHeight());
 		glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["DepthMapFBO"]);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -23,9 +24,10 @@ void ShadowRenderer::Run()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, screenWidth, screenHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);// set back
-
+		
 		glViewport(0, 0, screenWidth, screenHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 		frameUpdateViewProjectionMatrix(); // 会把shadow的view和projection也设置了，但是它没有这两个变量
 		coreShaderArr["AdvanceLightShader"]->setVec3("viewPos", pCamera->getCameraPosition());
 		for (auto& tex : coreTexture2dArr)
@@ -34,7 +36,7 @@ void ShadowRenderer::Run()
 		renderScene(*coreShaderArr["AdvanceLightShader"]);
 
 		glfwSwapBuffers(window);
-		glfwPollEvents();
+		glfwPollEvents(); 
 	}
 }
 
@@ -42,6 +44,11 @@ void ShadowRenderer::initScene()
 {
 	initVAO();
 	initShaderContent();
+	coreTexture2dArr["DepthMap"]->use();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
 
 void ShadowRenderer::initResource()
@@ -71,7 +78,6 @@ void ShadowRenderer::initVAO()
 	glGenVertexArrays(1, &cubeVAO);
 	coreVAOArr["CubeVAO"] = cubeVAO;
 	glBindBuffer(GL_ARRAY_BUFFER, coreVBOArr["CubeVBO"]);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 	glBindVertexArray(cubeVAO);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -85,8 +91,8 @@ void ShadowRenderer::initVAO()
 	unsigned int planeVAO;
 	glGenVertexArrays(1, &planeVAO);
 	coreVAOArr["PlaneVAO"] = planeVAO;
+	glBindVertexArray(planeVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, coreVBOArr["PlaneVBO"]);
-	glBufferData(GL_ARRAY_BUFFER, planeVerticesSize, planeVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
