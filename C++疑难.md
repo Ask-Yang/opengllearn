@@ -20,7 +20,11 @@
 
 ### 2、 raw pointer, smart pointer , reference
 
-只要是需要动态分配的对象就可以用智能指针。智能指针就是为了方便管理内存而生的，不会有有个地方用了智能指针而它指向的内存却为空这种情况（这是原始指针最大的缺点）（只要你规范的使用智能指针，不随意将它转换成原始指针）。
+只要是需要动态分配的对象就可以用智能指针。
+
+*智能指针就是为了方便管理内存而生的，不会有有个地方用了智能指针而它指向的内存却为空这种情况（这是原始指针最大的缺点）（只要你规范的使用智能指针，不随意将它转换成原始指针）。*
+
+21/8/1 这么看上述又错了，实际上shared_ptr照样可以为空。比如和weak_ptr搭配使用，这个时候也有可能为空。
 
 一个类拥有一个不属于它的成员最好用引用，因为引用必须要在构造函数中赋值，这就明确了引用的生命期。
 
@@ -285,3 +289,41 @@ shared_ptr使用引用计算来管理内存，但是有以下缺点：
 4. 比普通指针占用更多开销。
 
 另外，如果觉得std::shared_ptr<classname>这样名字太长可以使用typedef。
+
+shared_ptr实际上是在延续一个对象的生命期，也就是说，这个对象拥有另一个对象，比如说车子拥有四个轮子，少了轮子就不是车子了（一般而言）。
+
+而对于weak_ptr:
+
+Another answer, hopefully simpler. (for fellow googlers)
+
+Suppose you have `Team` and `Member` objects.
+
+Obviously it's a relationship : the `Team` object will have pointers to its `Members`. And it's likely that the members will also have a back pointer to their `Team` object.
+
+Then you have a dependency cycle. If you use `shared_ptr`, objects will no longer be automatically freed when you abandon reference on them, because they reference each other in a cyclic way. This is a memory leak.
+
+You break this by using `weak_ptr`. The "owner" typically use `shared_ptr` and the "owned" use a `weak_ptr` to its parent, and convert it *temporarily* to `shared_ptr` when it needs access to its parent.
+
+Store a weak ptr :
+
+```cpp
+weak_ptr<Parent> parentWeakPtr_ = parentSharedPtr; // automatic conversion to weak from shared
+```
+
+then use it when needed
+
+```cpp
+shared_ptr<Parent> tempParentSharedPtr = parentWeakPtr_.lock(); // on the stack, from the weak ptr
+if( !tempParentSharedPtr ) {
+  // yes, it may fail if the parent was freed since we stored weak_ptr
+} else {
+  // do stuff
+}
+// tempParentSharedPtr is released when it goes out of scope
+```
+
+也就是说虽然球队没有队员就不能存在，但是实际上，球队这个概念还是存在的，而且对于编程来说，一般更高的抽象都是作为parent的，或者更大的，声明期更长的。同时这也从另一方面说明了球员不能决定球队是否存在。另外在这个球员的例子中，球员对于球队的成员指针可以是weak，但是对外的接口却可以是shared。其中转换就在内部完成。
+
+其实还有更简单的方法来判断作用域依赖，你直接声明一个类是另一个类的weak然后试试代码能不能跑就行。
+
+总而言之，要尽量避免循环引用。
