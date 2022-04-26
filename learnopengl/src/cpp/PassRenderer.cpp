@@ -49,6 +49,12 @@ std::string PassRenderer::addTexture(std::string textureName, unsigned int width
 	return textureName;
 }
 
+std::string PassRenderer::addTexture(std::string textureName, unsigned int width, unsigned int height, unsigned int GLTEXTUREFORMAT, unsigned int GLDATAFORMAT)
+{
+	coreTexture2dArr[textureName] = make_shared<Texture2D>(width, height, GLTEXTUREFORMAT, GLDATAFORMAT);
+	return textureName;
+}
+
 std::string PassRenderer::addVBO(std::string VBOName, float* vertices, unsigned int verticesSize)
 {
 	unsigned int VBO;

@@ -40,6 +40,20 @@ Texture2D::Texture2D(unsigned int _width, unsigned int _height, unsigned int GLT
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
+Texture2D::Texture2D(unsigned int _width, unsigned int _height, unsigned int GLTEXTUREFORMAT, unsigned int GLDATAFORMAT)
+{
+	current_gl_texture_macro = gl_texture_macro_index++;
+	width = _width;
+	height = _height;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GLTEXTUREFORMAT, width, height, 0, GLTEXTUREFORMAT, GLDATAFORMAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
+
 void Texture2D::use()
 {
 	glActiveTexture(current_gl_texture_macro);

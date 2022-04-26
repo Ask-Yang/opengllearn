@@ -23,6 +23,7 @@ protected:
 
 	std::string addTexture(std::string textureName, std::string texturePath);
 	std::string addTexture(std::string textureName, unsigned int width, unsigned int height, unsigned int GLTEXTUREFORMAT);
+	std::string addTexture(std::string textureName, unsigned int width, unsigned int height, unsigned int GLTEXTUREFORMAT, unsigned int GLDATAFORMAT);
 	std::string addVBO(std::string VBOName, float* vertices, unsigned int verticesSize);
 
 protected:

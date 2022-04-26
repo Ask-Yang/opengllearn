@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Renderer">
+      <UniqueIdentifier>{059e9c1a-3598-4d52-a481-62fc52a85f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Renderer">
+      <UniqueIdentifier>{a91778b6-7eff-4297-80af-36d1940eb29a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL">
+      <UniqueIdentifier>{4c74c2f4-d805-4828-afea-626b4cbed278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\NewFilter1">
+      <UniqueIdentifier>{53cebf6c-a7b6-46fb-985e-a6eedb98d150}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cpp\glad.c">
@@ -84,6 +96,9 @@
     <ClCompile Include="src\cpp\ShadowRenderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\Renderer\TAARenderer.cpp">
+      <Filter>源文件\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\GLRenderCore.h">
@@ -140,6 +155,9 @@
     <ClInclude Include="src\header\ShadowRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Renderer\TAARenderer.h">
+      <Filter>头文件\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="learnopengl.rc">
@@ -148,5 +166,46 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="src\GLSL\advance.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\advance.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\cube.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\cube.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\light.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\model.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\model.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\outline.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\postprocess.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\postprocess.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\skybox.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\skybox.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\transparent.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="src\GLSL\TAA\quad.frag" />
+    <None Include="src\GLSL\TAA\quad.vert" />
   </ItemGroup>
 </Project>

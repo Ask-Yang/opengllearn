@@ -21,6 +21,7 @@ public:
 	std::string type;
 	explicit Texture2D(std::string texturePath);
 	explicit Texture2D(unsigned int _width, unsigned int _height, unsigned int GLTEXTUREFORMAT);
+	explicit Texture2D(unsigned int _width, unsigned int _height, unsigned int GLTEXTUREFORMAT, unsigned int GLDATAFORMAT);
 	void use();
 	void use(int GL_TEXTURE_MACRO);
 	void setTextureWrapMode(WrapMode wm);

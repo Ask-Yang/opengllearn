@@ -21,13 +21,10 @@ void ShadowRenderer::Run()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		coreShaderArr["ShadowShader"]->use();
 		renderScene(*coreShaderArr["ShadowShader"]);
+		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, screenWidth, screenHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);// set back
-		
-		glViewport(0, 0, screenWidth, screenHeight);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
 		frameUpdateViewProjectionMatrix(); // 会把shadow的view和projection也设置了，但是它没有这两个变量
 		coreShaderArr["AdvanceLightShader"]->setVec3("viewPos", pCamera->getCameraPosition());
 		for (auto& tex : coreTexture2dArr)

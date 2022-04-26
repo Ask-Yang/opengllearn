@@ -4,9 +4,11 @@
 #include "ModelRenderer.h"
 #include "AdvanceRenderer.h"
 #include "ShadowRenderer.h"
+#include "Renderer/TAARenderer.h"
+
 int main()
 {
-	ShadowRenderer glrcore;
+	TAARenderer glrcore;
 	glrcore.Init();
 	glrcore.Run();
     return 0;
