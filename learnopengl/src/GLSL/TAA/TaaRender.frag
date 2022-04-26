@@ -6,11 +6,12 @@ in VS_OUT {
     vec3 Normal;
     vec2 TexCoords;
     vec4 FragPosLightSpace;
+    vec4 ClipPos;
 } fs_in;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
-//uniform sampler2D lastFrame;
+uniform sampler2D lastFrame;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -58,9 +59,11 @@ void main()
     vec3 specular = spec * lightColor;    
     // º∆À„“ı”∞
     float shadow = ShadowCalculation(normal, lightDir, fs_in.FragPosLightSpace);       
-    vec3 lighting = (ambient +   (1-shadow) * (diffuse + specular)) * color;    
-
-    // vec3 lastColor = texture(lastFrame, fs_in.TexCoords).rgb;
-    //FragColor = vec4((1-alpha) * lastColor + alpha * lighting,1.0f);
-    FragColor = vec4(lighting, 1);
+    vec3 lighting = (ambient + (1-shadow) * (diffuse + specular)) * color;    
+    vec2 screenCoord = vec2(fs_in.ClipPos.xy / fs_in.ClipPos.w);
+    screenCoord = (screenCoord.xy + 1)/2;
+    
+    vec3 lastColor = texture(lastFrame, screenCoord).xyz;
+    vec3 finalColor = alpha * lighting + (1-alpha) * lastColor;
+    FragColor = vec4(finalColor,1 );
 }

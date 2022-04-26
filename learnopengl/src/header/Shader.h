@@ -8,6 +8,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
+#include <map>
 
 class Shader {
 public:
@@ -17,6 +19,7 @@ public:
 	void use();
 	void setBool(const std::string shaderVariableName, bool value);
 	void setTexture(const std::string shaderVariableName, int textureSlotNumber);
+	void bindAndSetTexture(const std::string shaderVariableName, int textureID);
 	void setInt(const std::string shaderVariableName, int value);
 	void setFloat(const std::string shaderVariableName, float value);
 	void setMat4(const std::string shaderVariableName, glm::mat4 matrix);
@@ -33,6 +36,8 @@ private:
 	unsigned int shaderProgram = 0;
 	unsigned int fragmentShader = 0;
 	unsigned int vertexShader = 0;
+	unsigned int shaderTextureSlot = 0;
+	std::map<unsigned int, unsigned int> textureSlotMap;
 	std::string m_vShaderString;
 	std::string m_fShaderString;
 };

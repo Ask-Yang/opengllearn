@@ -14,6 +14,11 @@ Shader::Shader(string vertexPath, string fragmentPath)
 void Shader::use() 
 {
 	glUseProgram(ID);
+	for (int i=0;i<textureSlotMap.size();i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, textureSlotMap[i]);
+	}
 }
 void Shader::setBool(const std::string shaderVariableName, bool value) 
 {
@@ -24,6 +29,17 @@ void Shader::setTexture(const std::string shaderVariableName, int textureSlotNum
 {
 	use();
 	glUniform1i(glGetUniformLocation(ID, shaderVariableName.c_str()), textureSlotNumber);
+}
+void Shader::bindAndSetTexture(const std::string shaderVariableName, int textureID)
+{
+	if (shaderTextureSlot < 10)
+	{
+		use();
+		textureSlotMap[shaderTextureSlot] = textureID;
+		glUniform1i(glGetUniformLocation(ID, shaderVariableName.c_str()), shaderTextureSlot++);
+	}
+	else
+		cout << "Texture slot is not enough" << endl;
 }
 void Shader::setInt(const std::string shaderVariableName, int value) 
 {

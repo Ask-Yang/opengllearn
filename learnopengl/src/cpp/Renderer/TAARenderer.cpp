@@ -12,17 +12,6 @@ extern unsigned int quadVerticesSize;
 
 void TAARenderer::Run()
 {
-	// 先渲染一次没有jitter的写入lastFrame
-	
-	/*coreShaderArr["TaaRenderShader"]->setFloat("alpha", 1);
-	glViewport(0, 0, screenWidth, screenHeight);
-	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["LastFrameFBO"]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	frameUpdateViewProjectionMatrix();
-	coreShaderArr["TaaRenderShader"]->use();
-	renderScene(*coreShaderArr["TaaRenderShader"]);
-	coreShaderArr["TaaRenderShader"]->setFloat("alpha", 0.04);*/
-	
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
@@ -103,6 +92,26 @@ void TAARenderer::initResource()
 	coreFBOArr["InterFrameFBO"] = interFrameFBO;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// final frame
+	GLuint combineFrameFBO;
+	glGenFramebuffers(1, &combineFrameFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, combineFrameFBO);
+
+	addTexture("CombineFrameBuffer", screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE);
+	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["CombineFrameBuffer"]->getTextureID());
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+		coreTexture2dArr["CombineFrameBuffer"]->getTextureID(), 0);
+
+	GLuint combineRbo;
+	glGenRenderbuffers(1, &combineRbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, combineRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, combineRbo);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	coreFBOArr["CombineFrameFBO"] = combineFrameFBO;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	// add shader
 	addShaderProgram("ShadowShader", "./src/GLSL/TAA/shadow.vert", "./src/GLSL/TAA/shadow.frag");
 	addShaderProgram("TaaRenderShader", "./src/GLSL/TAA/TaaRender.vert", "./src/GLSL/TAA/TaaRender.frag");
@@ -160,12 +169,11 @@ void TAARenderer::initVAO()
 void TAARenderer::initShaderContent()
 {
 	depthMapMatrix();
-	coreShaderArr["TaaRenderShader"]->setTexture("diffuseTexture", 0);
 	coreShaderArr["PostProcessShader"]->setTexture("screenTexture", 0);
 	coreShaderArr["PostProcessShader"]->setTexture("wood", 1);
-	coreShaderArr["TaaRenderShader"]->setTexture("diffuseTexture", 0);
-	coreShaderArr["TaaRenderShader"]->setTexture("shadowMap", 1);
-	coreShaderArr["TaaRenderShader"]->setTexture("lastFrame", 2);
+	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("diffuseTexture", coreTexture2dArr["WoodTexture"]->getTextureID());
+	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("shadowMap", coreTexture2dArr["DepthMap"]->getTextureID());
+	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("lastFrame", coreTexture2dArr["LastFrameBuffer"]->getTextureID());
 	coreShaderArr["TaaRenderShader"]->setMat4("lightSpaceMatrix", coreMatrixArr["LightSpaceMatrix"]);
 	vec3 lightPos(-2.0f, 4.0f, -1.0f);
 	coreShaderArr["TaaRenderShader"]->setVec3("lightPos", lightPos);
@@ -219,19 +227,14 @@ void TAARenderer::Render_Taa()
 	Render_ShadowMap();
 	
 	glViewport(0, 0, screenWidth, screenHeight);
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["InterFrameFBO"]);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	frameUpdateViewProjectionMatrix();
 	JitteringProjection();
 	coreShaderArr["TaaRenderShader"]->setVec3("viewPos", pCamera->getCameraPosition());
 	coreShaderArr["TaaRenderShader"]->use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["WoodTexture"]->getTextureID());
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["DepthMap"]->getTextureID());
+	
 	renderScene(*coreShaderArr["TaaRenderShader"]);
 }
 
@@ -240,7 +243,6 @@ void TAARenderer::Render_WithoutJitter()
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, screenWidth, screenHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["InterFrameFBO"]);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	frameUpdateViewProjectionMatrix();
 	coreShaderArr["TaaRenderShader"]->use();
 	glActiveTexture(GL_TEXTURE0);
@@ -257,25 +259,23 @@ void TAARenderer::Render_WithoutJitter()
 
 void TAARenderer::Render_PostProcess()
 {
-
 	glDisable(GL_DEPTH_TEST);
 	
-	/*glViewport(0, 0, screenWidth, screenHeight);
+	glViewport(0, 0, screenWidth, screenHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["LastFrameFBO"]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	coreShaderArr["PostProcessShader"]->use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["InterFrameBuffer"]->getTextureID());
 	glBindVertexArray(coreVAOArr["QuadVAO"]);
-	glDrawArrays(GL_TRIANGLES, 0, 6);*/
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	//glViewport(0, 0, screenWidth/2, screenHeight/2);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	 
 	coreShaderArr["PostProcessShader"]->use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["InterFrameBuffer"]->getTextureID());
-	//glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["LastFrameBuffer"]->getTextureID());
 	glBindVertexArray(coreVAOArr["QuadVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
