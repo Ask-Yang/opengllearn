@@ -16,13 +16,15 @@ void TAARenderer::Run()
 	{
 		processInput(window);
 		
+		Render_Velocity();
 		Render_Taa();
 		Render_WithoutJitter();
 		Render_PostProcess();
 		
-
+		RecordMatrix();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
 	}
 }
 
@@ -93,29 +95,31 @@ void TAARenderer::initResource()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// final frame
-	GLuint combineFrameFBO;
-	glGenFramebuffers(1, &combineFrameFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, combineFrameFBO);
+	GLuint velocityFrameFBO;
+	glGenFramebuffers(1, &velocityFrameFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, velocityFrameFBO);
 
-	addTexture("CombineFrameBuffer", screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE);
-	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["CombineFrameBuffer"]->getTextureID());
+	addTexture("VelocityFrameBuffer", screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE);
+	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["VelocityFrameBuffer"]->getTextureID());
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-		coreTexture2dArr["CombineFrameBuffer"]->getTextureID(), 0);
+		coreTexture2dArr["VelocityFrameBuffer"]->getTextureID(), 0);
 
-	GLuint combineRbo;
-	glGenRenderbuffers(1, &combineRbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, combineRbo);
+	GLuint velocityRbo;
+	glGenRenderbuffers(1, &velocityRbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, velocityRbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, combineRbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, velocityRbo);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	coreFBOArr["CombineFrameFBO"] = combineFrameFBO;
+	coreFBOArr["VelocityFrameFBO"] = velocityFrameFBO;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// add shader
 	addShaderProgram("ShadowShader", "./src/GLSL/TAA/shadow.vert", "./src/GLSL/TAA/shadow.frag");
 	addShaderProgram("TaaRenderShader", "./src/GLSL/TAA/TaaRender.vert", "./src/GLSL/TAA/TaaRender.frag");
 	addShaderProgram("PostProcessShader", "./src/GLSL/TAA/quad.vert", "./src/GLSL/TAA/quad.frag");
+	addShaderProgram("VelocityShader", "./src/GLSL/TAA/velocity.vert", "./src/GLSL/TAA/velocity.frag");
+	addShaderProgram("LightingRenderShader", "./src/GLSL/TAA/TaaRender.vert", "./src/GLSL/TAA/TaaRender.frag", "", "#define LIGHT\n");
 
 	// add vbo, add model texture
 	addVBO("CubeVBO", vertices, verticesSize);
@@ -171,14 +175,19 @@ void TAARenderer::initShaderContent()
 	depthMapMatrix();
 	coreShaderArr["PostProcessShader"]->setTexture("screenTexture", 0);
 	coreShaderArr["PostProcessShader"]->setTexture("wood", 1);
+
 	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("diffuseTexture", coreTexture2dArr["WoodTexture"]->getTextureID());
 	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("shadowMap", coreTexture2dArr["DepthMap"]->getTextureID());
 	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("lastFrame", coreTexture2dArr["LastFrameBuffer"]->getTextureID());
+	coreShaderArr["TaaRenderShader"]->bindAndSetTexture("velocityBuffer", coreTexture2dArr["VelocityFrameBuffer"]->getTextureID());
 	coreShaderArr["TaaRenderShader"]->setMat4("lightSpaceMatrix", coreMatrixArr["LightSpaceMatrix"]);
 	vec3 lightPos(-2.0f, 4.0f, -1.0f);
 	coreShaderArr["TaaRenderShader"]->setVec3("lightPos", lightPos);
 	coreShaderArr["TaaRenderShader"]->setFloat("alpha", 0.04);
-	
+
+	coreShaderArr["LightingRenderShader"]->bindAndSetTexture("diffuseTexture", coreTexture2dArr["WoodTexture"]->getTextureID());
+	coreShaderArr["LightingRenderShader"]->bindAndSetTexture("shadowMap", coreTexture2dArr["DepthMap"]->getTextureID());
+	coreShaderArr["LightingRenderShader"]->setVec3("lightPos", lightPos);
 }
 
 void TAARenderer::depthMapMatrix()
@@ -195,8 +204,15 @@ void TAARenderer::depthMapMatrix()
 
 void TAARenderer::renderScene(Shader& shader)
 {
+	int modelMatrixIndex = 0;
 	glm::mat4 model = glm::mat4(1.0f);
 	shader.setMat4("model", model);
+	currentModelMatrixMap[modelMatrixIndex++] = model;
+	if (!lastModelMatrixQueue.empty())
+	{
+		shader.setMat4("lastModel", lastModelMatrixQueue.front());
+		lastModelMatrixQueue.pop();
+	}
 	glBindVertexArray(coreVAOArr["PlaneVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	// cubes
@@ -204,12 +220,24 @@ void TAARenderer::renderScene(Shader& shader)
 	model = glm::translate(model, vec3(0.0f, 1.5f, 0.0f));
 	model = scale(model, vec3(0.5f));
 	shader.setMat4("model", model);
+	currentModelMatrixMap[modelMatrixIndex++] = model;
+	if (!lastModelMatrixQueue.empty())
+	{
+		shader.setMat4("lastModel", lastModelMatrixQueue.front());
+		lastModelMatrixQueue.pop();
+	}
 	glBindVertexArray(coreVAOArr["CubeVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
 	model = glm::scale(model, glm::vec3(0.5f));
 	shader.setMat4("model", model);
+	currentModelMatrixMap[modelMatrixIndex++] = model;
+	if (!lastModelMatrixQueue.empty())
+	{
+		shader.setMat4("lastModel", lastModelMatrixQueue.front());
+		lastModelMatrixQueue.pop();
+	}
 	glBindVertexArray(coreVAOArr["CubeVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	model = glm::mat4(1.0f);
@@ -217,15 +245,46 @@ void TAARenderer::renderScene(Shader& shader)
 	model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
 	model = glm::scale(model, glm::vec3(0.25));
 	shader.setMat4("model", model);
+	currentModelMatrixMap[modelMatrixIndex++] = model;
+	if (!lastModelMatrixQueue.empty())
+	{
+		shader.setMat4("lastModel", lastModelMatrixQueue.front());
+		lastModelMatrixQueue.pop();
+	}
 	glBindVertexArray(coreVAOArr["CubeVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void TAARenderer::RecordMatrix()
+{
+	mat4 view = pCamera->getViewMatrix();
+	mat4 projection = perspective(radians(pCamera->getFov()), screenWidth / (float)screenHeight, 0.1f, 100.0f);
+	lastView = view;
+	lastProjection = projection;
+	for (auto& m : currentModelMatrixMap)
+		lastModelMatrixQueue.push(m.second);
+}
+
+void TAARenderer::Render_Velocity()
+{
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, screenWidth, screenHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["VelocityFrameFBO"]);
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	frameUpdateViewProjectionMatrix();
+	coreShaderArr["VelocityShader"]->setMat4("lastProjection", lastProjection);
+	coreShaderArr["VelocityShader"]->setMat4("lastView", lastView);
+	coreShaderArr["VelocityShader"]->use();
+
+	renderScene(*coreShaderArr["VelocityShader"]);
 }
 
 void TAARenderer::Render_Taa()
 {
 	glEnable(GL_DEPTH_TEST);
 	Render_ShadowMap();
-	
+	// taa render
 	glViewport(0, 0, screenWidth, screenHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["InterFrameFBO"]);
 	glClearColor(1, 1, 1, 1);
@@ -234,33 +293,9 @@ void TAARenderer::Render_Taa()
 	JitteringProjection();
 	coreShaderArr["TaaRenderShader"]->setVec3("viewPos", pCamera->getCameraPosition());
 	coreShaderArr["TaaRenderShader"]->use();
-	
 	renderScene(*coreShaderArr["TaaRenderShader"]);
-}
-
-void TAARenderer::Render_WithoutJitter()
-{
-	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, screenWidth, screenHeight);
-	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["InterFrameFBO"]);
-	frameUpdateViewProjectionMatrix();
-	coreShaderArr["TaaRenderShader"]->use();
-	glActiveTexture(GL_TEXTURE0);
-	int textureID = coreTexture2dArr["WoodTexture"]->getTextureID();
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glm::mat4 model;
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, vec3(0.0f, 4.0f, 0.0f));
-	model = scale(model, vec3(0.5f));
-	coreShaderArr["TaaRenderShader"]->setMat4("model", model);
-	glBindVertexArray(coreVAOArr["CubeVAO"]);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
-void TAARenderer::Render_PostProcess()
-{
+	// render to last frame
 	glDisable(GL_DEPTH_TEST);
-	
 	glViewport(0, 0, screenWidth, screenHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["LastFrameFBO"]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -269,13 +304,38 @@ void TAARenderer::Render_PostProcess()
 	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["InterFrameBuffer"]->getTextureID());
 	glBindVertexArray(coreVAOArr["QuadVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
 
+void TAARenderer::Render_WithoutJitter()
+{
+	//render unjitter object
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, screenWidth, screenHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, coreFBOArr["InterFrameFBO"]);
+	frameUpdateViewProjectionMatrix();
+	coreShaderArr["LightingRenderShader"]->use();
+	glActiveTexture(GL_TEXTURE0);
+	int textureID = coreTexture2dArr["WoodTexture"]->getTextureID();
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glm::mat4 model;
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, vec3(0.0f, 4.0f, 0.0f));
+	model = scale(model, vec3(0.5f));
+	coreShaderArr["LightingRenderShader"]->setMat4("model", model);
+	glBindVertexArray(coreVAOArr["CubeVAO"]);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void TAARenderer::Render_PostProcess()
+{
+	glDisable(GL_DEPTH_TEST);
+	// render to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	coreShaderArr["PostProcessShader"]->use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["LastFrameBuffer"]->getTextureID());
+	glBindTexture(GL_TEXTURE_2D, coreTexture2dArr["InterFrameBuffer"]->getTextureID());
 	glBindVertexArray(coreVAOArr["QuadVAO"]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }

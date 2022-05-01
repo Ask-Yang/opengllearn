@@ -207,5 +207,15 @@
     </None>
     <None Include="src\GLSL\TAA\quad.frag" />
     <None Include="src\GLSL\TAA\quad.vert" />
+    <None Include="src\GLSL\TAA\velocity.vert" />
+    <None Include="src\GLSL\TAA\velocity.frag" />
+    <None Include="src\GLSL\TAA\shadow.frag" />
+    <None Include="src\GLSL\TAA\shadow.vert" />
+    <None Include="src\GLSL\TAA\TaaRender.frag" />
+    <None Include="src\GLSL\TAA\TaaRender.vert" />
+    <None Include="src\GLSL\AdvanceLight\shadow.vert" />
+    <None Include="src\GLSL\AdvanceLight\advanceLight.frag" />
+    <None Include="src\GLSL\AdvanceLight\advanceLight.vert" />
+    <None Include="src\GLSL\AdvanceLight\shadow.frag" />
   </ItemGroup>
 </Project>

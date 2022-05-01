@@ -15,11 +15,12 @@ class Shader {
 public:
 	unsigned int ID;
 	Shader(std::string vertexPath, std::string fragmentPath);
+	Shader(std::string vertexPath, std::string fragmentPath, std::string vertexPrecomplie, std::string fragmentPrecomplie);
 
 	void use();
 	void setBool(const std::string shaderVariableName, bool value);
 	void setTexture(const std::string shaderVariableName, int textureSlotNumber);
-	void bindAndSetTexture(const std::string shaderVariableName, int textureID);
+	void bindAndSetTexture(const std::string shaderVariableName, int textureID); 
 	void setInt(const std::string shaderVariableName, int value);
 	void setFloat(const std::string shaderVariableName, float value);
 	void setMat4(const std::string shaderVariableName, glm::mat4 matrix);
@@ -27,6 +28,7 @@ public:
 	void setVec3(const std::string shaderVariableName, glm::vec3 vec);
 private:
 	void readShaderFileToString(std::string vertexPath, std::string fragmentPath);
+	void insertPreComplieIntoShaderStr(std::string vertexPrecomplie, std::string fragmentPrecomplie);
 	void compileVertexShader(std::string &vShaderString);
 	void compileFragmentShader(std::string &fShaderString);
 	void linkShaderProgram();

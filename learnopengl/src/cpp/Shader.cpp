@@ -11,6 +11,16 @@ Shader::Shader(string vertexPath, string fragmentPath)
 	deleteShaderSource();
 }
 
+Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string vertexPrecomplie, std::string fragmentPrecomplie)
+{
+	readShaderFileToString(vertexPath, fragmentPath);
+	insertPreComplieIntoShaderStr(vertexPrecomplie, fragmentPrecomplie);
+	compileVertexShader(m_vShaderString);
+	compileFragmentShader(m_fShaderString);
+	linkShaderProgram();
+	deleteShaderSource();
+}
+
 void Shader::use() 
 {
 	glUseProgram(ID);
@@ -94,6 +104,23 @@ void Shader::readShaderFileToString(string vertexPath, string fragmentPath)
 	}
 	
 }
+
+void Shader::insertPreComplieIntoShaderStr(std::string vertexPrecomplie, std::string fragmentPrecomplie)
+{
+	for (int i = 0; i < m_vShaderString.size(); i++)
+		if (m_vShaderString[i] == '\n')
+		{
+			m_vShaderString.insert(i + 1, vertexPrecomplie);
+			break;
+		}
+	for (int i = 0; i < m_fShaderString.size(); i++)
+		if (m_fShaderString[i] == '\n')
+		{
+			m_fShaderString.insert(i + 1, fragmentPrecomplie);
+			break;
+		}
+}
+
 
 void Shader::compileVertexShader(string& vShaderString)
 {

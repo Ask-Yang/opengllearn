@@ -65,6 +65,12 @@ std::string GLRenderCore::addShaderProgram(std::string shaderName, std::string v
 	return shaderName;
 }
 
+std::string GLRenderCore::addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath, std::string vertexPrecomplie, std::string fragmentPrecomplie)
+{
+	coreShaderArr[shaderName] = make_shared<Shader>(vertexShaderPath, fragmentShaderPath, vertexPrecomplie, fragmentPrecomplie);
+	return shaderName;
+}
+
 void GLRenderCore::frameUpdateViewProjectionMatrix()
 {
 	mat4 view = pCamera->getViewMatrix();

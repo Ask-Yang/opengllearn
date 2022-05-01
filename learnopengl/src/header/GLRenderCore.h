@@ -33,6 +33,7 @@ protected:
 	void processInput(GLFWwindow* window);
 
 	std::string addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath);
+	std::string addShaderProgram(std::string shaderName, std::string vertexShaderPath, std::string fragmentShaderPath, std::string vertexPrecomplie, std::string fragmentPrecomplie);
 	void frameUpdateViewProjectionMatrix();
 	
 

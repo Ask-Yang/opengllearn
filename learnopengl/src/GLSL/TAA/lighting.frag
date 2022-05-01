@@ -1,25 +1,18 @@
 #version 330 core
-
 out vec4 FragColor;
+
 in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
     vec4 FragPosLightSpace;
-    vec4 ClipPos;
-    vec2 ScreenCoord;
 } fs_in;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
-#ifndef LIGHT
-uniform sampler2D lastFrame;
-uniform sampler2D velocityBuffer;
-uniform float alpha;
-#endif
+
 uniform vec3 lightPos;
 uniform vec3 viewPos;
-
 
 float ShadowCalculation(vec3 normal, vec3 lightDir, vec4 fragPosLightSpace)
 {
@@ -42,27 +35,6 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec4 fragPosLightSpace)
     shadow /= 9.0f;
     return shadow;
 }
-#ifndef LIGHT
-vec2 SampleVelocityBufferWithDepthCore(vec2 uv)
-{
-    vec2 velocity = vec2(0);
-    float minDepth = 1000000;
-    for(int x=-1;x<2;x++)
-    {
-        for(int y=-1;y<2;y++)
-        {
-            vec3 currentVelocity = texture(velocityBuffer, vec2(uv.x+x, uv.y+y)).xyz;
-            if(currentVelocity.z < minDepth)
-            {
-                minDepth = currentVelocity.z;
-                velocity = currentVelocity.xy;
-            }
-        }
-    }
-    return velocity;
-}
-#endif
-
 
 void main()
 {           
@@ -70,7 +42,7 @@ void main()
     vec3 normal = normalize(fs_in.Normal);
     vec3 lightColor = vec3(1.0);
     // Ambient
-    vec3 ambient = 0.2 * color;
+    vec3 ambient = 0.15 * color;
     // Diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
@@ -84,17 +56,7 @@ void main()
     vec3 specular = spec * lightColor;    
     // ¼ÆËãÒõÓ°
     float shadow = ShadowCalculation(normal, lightDir, fs_in.FragPosLightSpace);       
-    vec3 lighting = (ambient + (1-shadow) * (diffuse + specular)) * color;    
-#ifndef LIGHT
-    vec2 screenCoord = vec2(fs_in.ClipPos.xy / fs_in.ClipPos.w);
-    screenCoord = (screenCoord.xy + 1)/2;
-    
-    vec2 velocity = SampleVelocityBufferWithDepthCore(screenCoord);
-    vec3 lastColor = texture(lastFrame, screenCoord - velocity).xyz;
-    vec3 finalColor = alpha * lighting + (1-alpha) * lastColor;
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
 
-    FragColor = vec4(finalColor, 1);
-#else 
-    FragColor = vec4(lighting, 1);
-#endif
+    FragColor = vec4(lighting,1.0f);
 }

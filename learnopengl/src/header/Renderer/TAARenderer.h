@@ -1,5 +1,6 @@
 #pragma once
 #include "PassRenderer.h"
+#include <queue>
 class TAARenderer :
 	public PassRenderer
 {
@@ -15,6 +16,8 @@ private:
 	void renderScene(Shader& shader);
 
 private:
+	void RecordMatrix();
+	void Render_Velocity();
 	void Render_Taa();
 	void Render_WithoutJitter();
 	void Render_PostProcess();
@@ -34,6 +37,8 @@ private:
 		0.366960347, -0.307915747
 	};
 
-
-
+	glm::mat4 lastView;
+	glm::mat4 lastProjection;
+	std::queue<glm::mat4> lastModelMatrixQueue;
+	std::map<int, glm::mat4> currentModelMatrixMap;
 };
