@@ -17,6 +17,7 @@ private:
 
 private:
 	void RecordMatrix();
+	void Render_Lighting();
 	void Render_Velocity();
 	void Render_Taa();
 	void Render_WithoutJitter();

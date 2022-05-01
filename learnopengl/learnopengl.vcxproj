@@ -86,12 +86,16 @@
     <None Include="src\GLSL\postprocess.vert" />
     <None Include="src\GLSL\skybox.frag" />
     <None Include="src\GLSL\skybox.vert" />
+    <None Include="src\GLSL\TAA\lighting.frag" />
+    <None Include="src\GLSL\TAA\lighting.vert" />
     <None Include="src\GLSL\TAA\quad.frag" />
     <None Include="src\GLSL\TAA\quad.vert" />
     <None Include="src\GLSL\TAA\shadow.frag" />
     <None Include="src\GLSL\TAA\shadow.vert" />
     <None Include="src\GLSL\TAA\TaaRender.frag" />
     <None Include="src\GLSL\TAA\TaaRender.vert" />
+    <None Include="src\GLSL\TAA\TaaRenderAdvance.frag" />
+    <None Include="src\GLSL\TAA\TaaRenderAdvance.vert" />
     <None Include="src\GLSL\TAA\velocity.frag" />
     <None Include="src\GLSL\TAA\velocity.vert" />
     <None Include="src\GLSL\transparent.frag" />

@@ -16,6 +16,8 @@ uniform sampler2D shadowMap;
 uniform sampler2D lastFrame;
 uniform sampler2D velocityBuffer;
 uniform float alpha;
+uniform mat3 RGBToYCoCgMat;
+uniform mat3 YCoCgToRGBMat;
 #endif
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -61,6 +63,17 @@ vec2 SampleVelocityBufferWithDepthCore(vec2 uv)
     }
     return velocity;
 }
+
+vec3 RGBToYCoCgTransFunc(vec3 rgbVec)
+{
+    return RGBToYCoCgMat * rgbVec;
+}
+
+vec3 YCoCgToRGBTransFunc(vec3 ycocgVec)
+{
+    return YCoCgToRGBMat * ycocgVec;
+}
+
 #endif
 
 

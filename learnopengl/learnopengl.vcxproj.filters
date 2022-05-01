@@ -217,5 +217,9 @@
     <None Include="src\GLSL\AdvanceLight\advanceLight.frag" />
     <None Include="src\GLSL\AdvanceLight\advanceLight.vert" />
     <None Include="src\GLSL\AdvanceLight\shadow.frag" />
+    <None Include="src\GLSL\TAA\lighting.frag" />
+    <None Include="src\GLSL\TAA\lighting.vert" />
+    <None Include="src\GLSL\TAA\TaaRenderAdvance.vert" />
+    <None Include="src\GLSL\TAA\TaaRenderAdvance.frag" />
   </ItemGroup>
 </Project>
