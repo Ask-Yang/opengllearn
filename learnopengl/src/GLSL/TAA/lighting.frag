@@ -36,6 +36,16 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec4 fragPosLightSpace)
     return shadow;
 }
 
+vec3 ACESFilm(vec3 x)
+{
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0, 1);
+}
+
 void main()
 {           
     vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
@@ -53,10 +63,10 @@ void main()
     float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * lightColor;    
+    vec3 specular = spec * lightColor ;    
     // º∆À„“ı”∞
     float shadow = ShadowCalculation(normal, lightDir, fs_in.FragPosLightSpace);       
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-
+    lighting = ACESFilm(lighting);
     FragColor = vec4(lighting,1.0f);
 }

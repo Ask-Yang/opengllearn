@@ -24,6 +24,7 @@ public:
 	void setInt(const std::string shaderVariableName, int value);
 	void setFloat(const std::string shaderVariableName, float value);
 	void setMat4(const std::string shaderVariableName, glm::mat4 matrix);
+	void setMat3(const std::string shaderVariableName, glm::mat3 matrix);
 	void setVec3(const std::string shaderVariableName, float value1, float value2, float valu3);
 	void setVec3(const std::string shaderVariableName, glm::vec3 vec);
 private:

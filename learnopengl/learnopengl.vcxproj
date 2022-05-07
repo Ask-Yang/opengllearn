@@ -88,6 +88,8 @@
     <None Include="src\GLSL\skybox.vert" />
     <None Include="src\GLSL\TAA\lighting.frag" />
     <None Include="src\GLSL\TAA\lighting.vert" />
+    <None Include="src\GLSL\TAA\postprocess.frag" />
+    <None Include="src\GLSL\TAA\postprocess.vert" />
     <None Include="src\GLSL\TAA\quad.frag" />
     <None Include="src\GLSL\TAA\quad.vert" />
     <None Include="src\GLSL\TAA\shadow.frag" />

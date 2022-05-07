@@ -23,7 +23,7 @@ private:
 	void Render_WithoutJitter();
 	void Render_PostProcess();
 	void Render_ShadowMap();
-	void JitteringProjection();
+	void JitteringProjection(Shader& shader, bool forward);
 	int TemporalSampleIndex = 0;
 	const float PI = 3.1415926535;
 

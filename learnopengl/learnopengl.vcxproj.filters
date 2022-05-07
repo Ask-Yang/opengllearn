@@ -221,5 +221,7 @@
     <None Include="src\GLSL\TAA\lighting.vert" />
     <None Include="src\GLSL\TAA\TaaRenderAdvance.vert" />
     <None Include="src\GLSL\TAA\TaaRenderAdvance.frag" />
+    <None Include="src\GLSL\TAA\postprocess.frag" />
+    <None Include="src\GLSL\TAA\postprocess.vert" />
   </ItemGroup>
 </Project>

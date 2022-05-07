@@ -5,7 +5,7 @@
 #include "AdvanceRenderer.h"
 #include "ShadowRenderer.h"
 #include "Renderer/TAARenderer.h"
-
+using namespace glm;
 int main()
 {
 	TAARenderer glrcore;
